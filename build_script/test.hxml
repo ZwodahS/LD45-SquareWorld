@@ -1,0 +1,5 @@
+--library heaps
+--library hlsdl
+--hl game.hl
+--main Main
+--class-path src
