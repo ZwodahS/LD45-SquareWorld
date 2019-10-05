@@ -36,6 +36,7 @@ class GameScene implements common.Scene {
     var assets: common.Assets;
 
     var scene: h2d.Scene;
+    var camera: h2d.Camera;
     var backgroundLayer: h2d.Layers;
     var worldLayer: h2d.Layers;
     var foregroundLayer: h2d.Layers;
@@ -49,8 +50,11 @@ class GameScene implements common.Scene {
 
     var speciesList: Array<Species>;
 
+    var moveCamera: Array<Bool> = [ false, false, false, false ];
+
     public function new(assets: common.Assets) {
         this.scene = new h2d.Scene();
+        this.camera = new h2d.Camera(this.scene);
         this.assets = assets;
         this.init();
         this.updater = new Updater();
@@ -62,9 +66,9 @@ class GameScene implements common.Scene {
     }
 
     function init() {
-        this.backgroundLayer = new h2d.Layers(this.scene);
-        this.worldLayer = new h2d.Layers(this.scene);
-        this.foregroundLayer = new h2d.Layers(this.scene);
+        this.backgroundLayer = new h2d.Layers(this.camera);
+        this.worldLayer = new h2d.Layers(this.camera);
+        this.foregroundLayer = new h2d.Layers(this.camera);
 
         this.world = new World(this.worldLayer, Constants.WorldWidth, Constants.WorldHeight);
         for (x in 0...Constants.WorldWidth) {
@@ -103,6 +107,16 @@ class GameScene implements common.Scene {
                 life.processReproduce(this.world);
             }
         }
+        var camMove = new Point2f(0, 0);
+        if (moveCamera[0]) camMove.y += dt * 500;
+        if (moveCamera[1]) camMove.x -= dt * 500;
+        if (moveCamera[2]) camMove.y -= dt * 500;
+        if (moveCamera[3]) camMove.x += dt * 500;
+        if (camMove.x != 0 || camMove.y != 0) {
+            this.camera.x += camMove.x;
+            this.camera.y += camMove.y;
+            alignCamera();
+        }
     }
 
     public function render(engine: h3d.Engine) {
@@ -113,21 +127,75 @@ class GameScene implements common.Scene {
         switch(event.kind) {
             case hxd.Event.EventKind.ERelease:
                 this.mouseClicked(event);
+            case hxd.Event.EventKind.EKeyDown:
+                this.keyPressed(event);
+            case hxd.Event.EventKind.EKeyUp:
+                this.keyReleased(event);
+            case hxd.Event.EventKind.EWheel:
+                this.scroll(event);
+            default:
+        }
+    }
+
+    function scroll(event: hxd.Event) {
+        if (event.wheelDelta > 0) {
+            this.camera.scaleX -= Math.min(0.1, event.wheelDelta*0.01);
+            this.camera.scaleY -= Math.min(0.1, event.wheelDelta*0.01);
+        } else if (event.wheelDelta < 0) {
+            this.camera.scaleX -= Math.max(-0.1, event.wheelDelta*0.01);
+            this.camera.scaleY -= Math.max(-0.1, event.wheelDelta*0.01);
+        }
+        this.camera.scaleX = hxd.Math.clamp(this.camera.scaleX, 0.5, 1.5);
+        this.camera.scaleY = hxd.Math.clamp(this.camera.scaleY, 0.5, 1.5);
+        this.alignCamera();
+    }
+
+    function alignCamera() {
+        var window = hxd.Window.getInstance();
+        this.camera.x = hxd.Math.clamp(
+                this.camera.x,
+                -(Constants.GridSize*this.camera.scaleX)*Constants.WorldWidth-5+window.width,
+                5);
+        this.camera.y = hxd.Math.clamp(
+                this.camera.y,
+                -(Constants.GridSize*this.camera.scaleY)*Constants.WorldHeight-5+window.height,
+                5);
+    }
+
+    function keyPressed(event: hxd.Event) {
+        switch(event.keyCode) {
+            case hxd.Key.W:
+                this.moveCamera[0] = true;
+            case hxd.Key.D:
+                this.moveCamera[1] = true;
+            case hxd.Key.S:
+                this.moveCamera[2] = true;
+            case hxd.Key.A:
+                this.moveCamera[3] = true;
+            default:
+        }
+    }
+
+    function keyReleased(event: hxd.Event) {
+        switch(event.keyCode) {
+            case hxd.Key.W:
+                this.moveCamera[0] = false;
+            case hxd.Key.D:
+                this.moveCamera[1] = false;
+            case hxd.Key.S:
+                this.moveCamera[2] = false;
+            case hxd.Key.A:
+                this.moveCamera[3] = false;
             default:
         }
     }
 
     function mouseClicked(event: hxd.Event) {
         // check state
-        var pos = translateWorldPosToCell(translateMousePositionToWorld([
-                    event.relX, event.relY
-        ]));
-        if (!this.world.inBound(pos)) {
-            return;
-        }
-        if (this.world.cells[pos.x][pos.y].plant != null) {
-            return;
-        }
+        var pos = translateWorldPosToCell(translateMousePositionToWorld([event.relX, event.relY]));
+        if (!this.world.inBound(pos)) return;
+        if (this.world.cells[pos.x][pos.y].plant != null) return;
+
         this.placeLife(pos);
     }
 
@@ -137,10 +205,14 @@ class GameScene implements common.Scene {
     }
 
     function translateMousePositionToWorld(pos: Point2f): Point2f {
+        pos = pos - [this.camera.x, this.camera.y];
         return pos;
     }
 
     function translateWorldPosToCell(pos: Point2f): Point2i {
-        return [Math.floor(pos.x / Constants.GridSize), Math.floor(pos.y / Constants.GridSize) ];
+        return [
+            Math.floor(pos.x / (Constants.GridSize*this.camera.scaleX)),
+            Math.floor(pos.y / (Constants.GridSize*this.camera.scaleY))
+        ];
     }
 }
