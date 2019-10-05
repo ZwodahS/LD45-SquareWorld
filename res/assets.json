@@ -1,23 +1,42 @@
 {
-    "tile": {
-        "rect": {
-            "width": 32,
-            "height": 32,
-            "color": [255, 0, 0, 255]
-        }
+    "eyes": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "eyes0",
+                "color": [255, 255, 255, 255]
+            },
+            {
+                "src": "images",
+                "key": "eyes1",
+                "color": [255, 255, 255, 255]
+            }
+        ]
     },
-    "character": {
+    "fill": {
         "frame": {
-            "src": "font32",
-            "key": "@",
+            "src": "images",
+            "key": "fill",
             "color": [255, 255, 255, 255]
         }
     },
-    "wall": {
-        "frame": {
-            "src": "font32",
-            "key": "#",
-            "color": [255, 255, 255, 255]
-        }
+    "skins": {
+        "frames":[
+            {
+                "src": "images",
+                "key": "skins0",
+                "color": [255, 255, 255, 255]
+            },
+            {
+                "src": "images",
+                "key": "skins1",
+                "color": [255, 255, 255, 255]
+            },
+            {
+                "src": "images",
+                "key": "skins2",
+                "color": [255, 255, 255, 255]
+            }
+        ]
     }
 }

@@ -9,6 +9,7 @@ class Game extends hxd.App {
     override function init() {
         // resize window if necessary
         var window = hxd.Window.getInstance();
+        trace(window.width, window.height);
         // window.resize(1600, 900);
 
         hxd.Res.initEmbed();
