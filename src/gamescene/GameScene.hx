@@ -2,6 +2,7 @@
 package gamescene;
 
 import haxe.ds.Vector;
+import gamescene.Life;
 
 interface Updatable {
     function update(dt: Float): Void ;
@@ -43,7 +44,6 @@ class Grid {
         this.drawable.add(nutrientsBitmap, 1);
         this.nutrients = Math.floor(Math.random() * 10);
         this.nutrientsBitmap.color.w = Math.min(this.nutrients / 300, 0.3);
-
     }
 
     public function set_x(x: Int): Int {
@@ -60,6 +60,7 @@ class Grid {
 }
 
 
+
 class GameScene implements common.Scene {
 
 
@@ -71,7 +72,6 @@ class GameScene implements common.Scene {
     var foregroundLayer: h2d.Layers;
 
     var updater: Updater;
-    var sun: Sun;
 
     var world: Vector<Vector<Grid>>;
 
@@ -80,6 +80,11 @@ class GameScene implements common.Scene {
         this.assets = assets;
         this.init();
         this.updater = new Updater();
+
+        var species = new Species(assets);
+
+        var creature = species.newLife();
+        this.worldLayer.add(creature.drawable, 0);
     }
 
     function init() {

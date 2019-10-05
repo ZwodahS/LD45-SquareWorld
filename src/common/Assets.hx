@@ -50,6 +50,11 @@ class Tile {
         bm.color = this.color;
         return bm;
     }
+
+    public function copy(): Tile {
+        var t = new Tile(this.tile, this.color);
+        return t;
+    }
 }
 
 /**
