@@ -74,6 +74,7 @@ class GameScene implements common.Scene {
     var moveCamera: Array<Bool> = [ false, false, false, false ];
 
     var hud: Hud;
+    var isPaused: Bool = false;
 
     public function new(assets: common.Assets) {
         this.scene = new h2d.Scene();
@@ -103,33 +104,38 @@ class GameScene implements common.Scene {
         }
     }
 
+    function simulate() {
+        for (life in this.world.lifeList) {
+            life.processMove(this.world);
+        }
+        for (life in this.world.lifeList) {
+            life.processExtract(this.world);
+        }
+        for (life in this.world.lifeList) {
+            life.processProduce(this.world);
+        }
+        for (life in this.world.lifeList) {
+            life.processAge(this.world);
+        }
+        for (life in this.world.lifeList) {
+            if (!life.isAlive) {
+                life.processDie(this.world);
+                this.world.removeLife(life);
+            }
+        }
+        for (life in this.world.lifeList) {
+            life.processReproduce(this.world);
+        }
+    }
+
     public function update(dt: Float) {
         updater.update(dt);
 
         this.timeElapsed += dt;
         if (timeElapsed > this.timePerStep) {
             this.timeElapsed -= this.timePerStep;
-
-            for (life in this.world.lifeList) {
-                life.processMove(this.world);
-            }
-            for (life in this.world.lifeList) {
-                life.processExtract(this.world);
-            }
-            for (life in this.world.lifeList) {
-                life.processProduce(this.world);
-            }
-            for (life in this.world.lifeList) {
-                life.processAge(this.world);
-            }
-            for (life in this.world.lifeList) {
-                if (!life.isAlive) {
-                    life.processDie(this.world);
-                    this.world.removeLife(life);
-                }
-            }
-            for (life in this.world.lifeList) {
-                life.processReproduce(this.world);
+            if (!this.isPaused) {
+                this.simulate();
             }
         }
         var camMove = new Point2f(0, 0);
@@ -257,6 +263,8 @@ class GameScene implements common.Scene {
                 this.moveCamera[2] = true;
             case hxd.Key.A:
                 this.moveCamera[3] = true;
+            case hxd.Key.SPACE:
+                this.isPaused = !this.isPaused;
             default:
         }
     }
