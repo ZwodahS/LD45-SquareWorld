@@ -19,6 +19,14 @@ class PlantSpecies extends Species{
     var fill: common.Assets.Tile;
     var deco: common.Assets.Tile;
 
+    public var energyMultiplier(default, null): Float = 5.0;
+    public var energyConsumption(default, null): Int = 25;
+    public var reproductionChance(default, null): Int = 5;
+    public var reproductionEnergyRequirement(default, null): Int = 100;
+    public var reproductionAgeRequirement(default, null): Int = 10;
+    public var ageNutrientsMultiplier(default, null):Float = 7;
+    public var nutrientAbsorptionRate(default, null):Int = 10;
+
     public function new(assets: common.Assets) {
         super(assets);
 
@@ -41,6 +49,15 @@ class AnimalSpecies extends Species {
     var fill: common.Assets.Tile;
     var skin: common.Assets.Tile;
     var eye: common.Assets.Tile;
+
+    public var energyMultiplier(default, null): Float = 5.0;
+    public var nutrientAbsorptionRate(default, null):Int = 10;
+    public var ageNutrientsMultiplier(default, null): Float = 2;
+    public var energyConsumption(default, null): Int = 25;
+    public var reproductionChance(default, null): Int = 1;
+    public var reproductionEnergyRequirement(default, null): Int = 100;
+    public var reproductionAgeRequirement(default, null): Int = 10;
+    public var maxEnergy(default, null): Int = 500;
 
     public function new(assets: common.Assets) {
         super(assets);

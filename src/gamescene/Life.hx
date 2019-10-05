@@ -75,17 +75,11 @@ class PlantLife extends Life {
 
     var species: Species.PlantSpecies;
 
-    var energyMultiplier: Float = 5.0;
-    var energyConsumption: Int = 25;
-    var reproductionChance: Int = 10;
-    var reproductionEnergyRequirement: Int = 100;
-    var reproductionAgeRequirement: Int = 10;
-    var ageNutrientsMultiplier = 7;
-    var nutrientAbsorptionRate = 10;
-
     public var canReproduce(get, null): Bool;
 
     override public function get_type(): String { return "plant"; }
+
+    var drainedThisTurn: Int = 0;
 
     public function new(sp: Species.PlantSpecies) {
         super();
@@ -93,14 +87,15 @@ class PlantLife extends Life {
     }
 
     override public function processExtract(world: World) {
+        this.drainedThisTurn = 0;
         // Try extract current cell first
         var cell = world.cells[this.x][this.y];
         var drained:Int = 0;
-        var have = hxd.Math.imin(cell.nutrients, this.nutrientAbsorptionRate - drained);
+        var have = hxd.Math.imin(cell.nutrients, this.species.nutrientAbsorptionRate - drained);
         drained += have;
         cell.nutrients -= have;
 
-        if (drained != this.nutrientAbsorptionRate) {
+        if (drained != this.species.nutrientAbsorptionRate) {
             // extract from surrounding
             var cellList = common.GridUtils.getAround(world.cells, [this.x, this.y], 2);
             Random.shuffle(cellList);
@@ -110,33 +105,40 @@ class PlantLife extends Life {
                     continue;
                 }
                 if (cell.nutrients > 0) {
-                    have = hxd.Math.imin(cell.nutrients, this.nutrientAbsorptionRate - drained);
+                    have = hxd.Math.imin(cell.nutrients, this.species.nutrientAbsorptionRate - drained);
                     drained += have;
                     cell.nutrients -= have;
                 }
-                if (drained == this.nutrientAbsorptionRate){
+                if (drained == this.species.nutrientAbsorptionRate) {
                     break;
                 }
             }
         }
-
-        this.energy += Math.floor(this.energyMultiplier * drained);
+        drained = Math.floor(this.species.energyMultiplier * drained);
+        this.energy += drained;
+        this.drainedThisTurn = drained;
     }
 
     public function get_canReproduce(): Bool {
-        return this.energy > this.reproductionEnergyRequirement && this.age > this.reproductionAgeRequirement;
+        return (this.energy > this.species.reproductionEnergyRequirement &&
+                this.age > this.species.reproductionAgeRequirement);
     }
 
     override public function processAge(world: World) {
         super.processAge(world);
-        this.energy -= hxd.Math.imin(this.energy, this.energyConsumption);
+        this.energy -= hxd.Math.imin(this.energy, this.species.energyConsumption);
     }
 
     override public function processReproduce(world: World) {
         if (!this.canReproduce) {
             return;
         }
-        if (Random.int(0, 1000) > this.reproductionChance) {
+
+        var chance = this.species.reproductionChance;
+        if (this.drainedThisTurn == 0) {
+            chance += 20;
+        }
+        if (Random.int(0, 1000) > chance) {
             return;
         }
 
@@ -149,7 +151,9 @@ class PlantLife extends Life {
             }
 
             var life = this.species.newLife();
-            world.moveLife(life, [cell.x, cell.y]);
+            life.x = cell.x;
+            life.y = cell.y;
+            world.addLife(life);
             break;
         }
 
@@ -159,7 +163,7 @@ class PlantLife extends Life {
         var cellList = common.GridUtils.getAround(world.cells, [this.x, this.y], 2);
         cellList.push(world.cells[this.x][this.y]);
         Random.shuffle(cellList);
-        var newNutrients = this.age * this.ageNutrientsMultiplier;
+        var newNutrients = this.age * this.species.ageNutrientsMultiplier;
         var spread = Math.floor(newNutrients / 2 / cellList.length);
         // 50% evenly spread
         for (cell in cellList) {
@@ -176,13 +180,9 @@ class AnimalLife extends Life {
 
     var species: Species.AnimalSpecies;
 
-    var energyMultiplier: Float = 5.0;
-    var nutrientAbsorptionRate = 10;
-    var ageNutrientsMultiplier: Float = 2;
-    var energyConsumption: Int = 25;
-
     var currentDirection: Direction = Direction.None;
 
+    public var canReproduce(get, null): Bool;
     override public function get_type(): String { return "animal"; }
 
     public function new(sp: Species.AnimalSpecies) {
@@ -203,7 +203,7 @@ class AnimalLife extends Life {
 
     override public function processMove(world: World) {
         var cell = world.cells[this.x][this.y];
-        if (cell.nutrients > 0) return;
+        if (this.energy < this.species.maxEnergy && cell.nutrients > 0) return;
 
         if (this.shouldChangeDirection()) {
             this.changeDirection();
@@ -228,23 +228,58 @@ class AnimalLife extends Life {
     }
 
     override public function processExtract(world: World) {
+        if (this.energy > this.species.maxEnergy) {
+            return;
+        }
+
         var cell = world.cells[this.x][this.y];
         var drained:Int = 0;
-        var have = hxd.Math.imin(cell.nutrients, this.nutrientAbsorptionRate - drained);
+        var have = hxd.Math.imin(cell.nutrients, this.species.nutrientAbsorptionRate - drained);
 
         drained += have;
         cell.nutrients -= have;
 
-        this.energy += Math.floor(this.energyMultiplier * drained);
+        this.energy += Math.floor(this.species.energyMultiplier * drained);
     }
     override public function processProduce(world: World) {}
-    override public function processReproduce(world: World) {}
+    public function get_canReproduce(): Bool {
+        return (this.energy > this.species.reproductionEnergyRequirement &&
+                this.age > this.species.reproductionAgeRequirement);
+    }
+    override public function processReproduce(world: World) {
+        if (!this.canReproduce) {
+            return;
+        }
+
+        var chance = this.species.reproductionChance + (this.energy/200);
+        trace(this.energy);
+        trace(chance);
+        if (Random.int(0, 1000) > chance) {
+            return;
+        }
+
+        var cellList = common.GridUtils.getAround(world.cells, [this.x, this.y], 2);
+        Random.shuffle(cellList);
+
+        for (cell in cellList) {
+            if (cell.plant != null) {
+                continue;
+            }
+
+            var life = this.species.newLife();
+            life.x = cell.x;
+            life.y = cell.y;
+            world.addLife(life);
+            break;
+        }
+
+    }
     override public function processAge(world: World) {
         super.processAge(world);
-        this.energy -= hxd.Math.imin(this.energy, this.energyConsumption);
+        this.energy -= hxd.Math.imin(this.energy, this.species.energyConsumption);
     }
     override public function processDie(world: World) {
-        var newNutrients = Math.floor(this.age * this.ageNutrientsMultiplier);
+        var newNutrients = Math.floor(this.age * this.species.ageNutrientsMultiplier);
         var cell = world.cells[this.x][this.y];
         cell.nutrients += newNutrients;
     }
