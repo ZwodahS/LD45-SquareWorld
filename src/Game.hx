@@ -10,6 +10,9 @@ class Game extends hxd.App {
         // resize window if necessary
         var window = hxd.Window.getInstance();
         trace(window.width, window.height);
+        Constants.windowWidth = window.width;
+        Constants.windowHeight = window.height;
+        Constants.globalScale = window.width / 800;
         // window.resize(1600, 900);
 
         hxd.Res.initEmbed();

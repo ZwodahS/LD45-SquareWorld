@@ -5,7 +5,6 @@ class Species {
 
     var assets: common.Assets;
 
-
     public function new(assets: common.Assets) {
         this.assets = assets;
     }

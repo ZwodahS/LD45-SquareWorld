@@ -30,8 +30,29 @@ class Updater {
 }
 
 
-class GameScene implements common.Scene {
+class Hud {
 
+    public var drawable: h2d.Layers;
+
+    public function new(assets: common.Assets) {
+        this.drawable = new h2d.Layers();
+        this.drawable.scaleX = Constants.globalScale;
+        this.drawable.scaleY = Constants.globalScale;
+
+        var hudBG = assets.getAsset("background").tiles[0].getBitmap();
+        this.drawable.add(hudBG, 0);
+        this.drawable.x = Constants.windowWidth - (160 * Constants.globalScale);
+
+        var spCard = assets.getAsset("spcard").tiles[0].getBitmap();
+        this.drawable.add(spCard, 1);
+        spCard.x = 10;
+        spCard.y = 200;
+    }
+
+}
+
+
+class GameScene implements common.Scene {
 
     var assets: common.Assets;
 
@@ -52,6 +73,8 @@ class GameScene implements common.Scene {
 
     var moveCamera: Array<Bool> = [ false, false, false, false ];
 
+    var hud: Hud;
+
     public function new(assets: common.Assets) {
         this.scene = new h2d.Scene();
         this.camera = new h2d.Camera(this.scene);
@@ -59,6 +82,8 @@ class GameScene implements common.Scene {
         this.init();
         this.updater = new Updater();
         this.speciesList = new Array<Species>();
+        this.hud = new Hud(assets);
+        this.scene.add(this.hud.drawable, 0);
 
         this.speciesList.push(new Species.PlantSpecies(assets));
         this.speciesList.push(new Species.AnimalSpecies(assets));
@@ -139,14 +164,14 @@ class GameScene implements common.Scene {
 
     function scroll(event: hxd.Event) {
         if (event.wheelDelta > 0) {
-            this.camera.scaleX -= Math.min(0.1, event.wheelDelta*0.01);
-            this.camera.scaleY -= Math.min(0.1, event.wheelDelta*0.01);
+            this.camera.scaleX -= Math.min(0.1, event.wheelDelta*0.01) * Constants.globalScale;
+            this.camera.scaleY -= Math.min(0.1, event.wheelDelta*0.01) * Constants.globalScale;
         } else if (event.wheelDelta < 0) {
-            this.camera.scaleX -= Math.max(-0.1, event.wheelDelta*0.01);
-            this.camera.scaleY -= Math.max(-0.1, event.wheelDelta*0.01);
+            this.camera.scaleX -= Math.max(-0.1, event.wheelDelta*0.01) * Constants.globalScale;
+            this.camera.scaleY -= Math.max(-0.1, event.wheelDelta*0.01) * Constants.globalScale;
         }
-        this.camera.scaleX = hxd.Math.clamp(this.camera.scaleX, 0.5, 1.5);
-        this.camera.scaleY = hxd.Math.clamp(this.camera.scaleY, 0.5, 1.5);
+        this.camera.scaleX = hxd.Math.clamp(this.camera.scaleX, Constants.globalScale*0.5, Constants.globalScale*1.5);
+        this.camera.scaleY = hxd.Math.clamp(this.camera.scaleY, Constants.globalScale*0.5, Constants.globalScale*1.5);
         this.alignCamera();
     }
 
@@ -154,7 +179,7 @@ class GameScene implements common.Scene {
         var window = hxd.Window.getInstance();
         this.camera.x = hxd.Math.clamp(
                 this.camera.x,
-                -(Constants.GridSize*this.camera.scaleX)*Constants.WorldWidth-5+window.width,
+                -(Constants.GridSize*this.camera.scaleX)*Constants.WorldWidth-5+window.width-160,
                 5);
         this.camera.y = hxd.Math.clamp(
                 this.camera.y,

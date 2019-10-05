@@ -64,5 +64,19 @@
                 "color": [255, 255, 255, 255]
             }
         ]
+    },
+    "background": {
+        "frame": {
+            "src": "images",
+            "key": "background",
+            "color": [255, 255, 255, 255]
+        }
+    },
+    "spcard": {
+        "frame": {
+            "src": "images",
+            "key": "spcard",
+            "color": [255, 255, 255, 255]
+        }
     }
 }

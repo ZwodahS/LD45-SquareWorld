@@ -6,6 +6,7 @@ all:
 	cp images.png build/images.png
 	mkdir build/split
 	python3 assets.py crop build/images.json build/images.png build/split/
+	cp raw/* build/split/.
 	python3 assets.py pack build/split build/rejoin
 	cp build/rejoin.json ../res/images.json
 	cp build/rejoin.png ../res/images.png
