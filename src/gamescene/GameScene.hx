@@ -60,8 +60,8 @@ class GameScene implements common.Scene {
         this.updater = new Updater();
         this.speciesList = new Array<Species>();
 
-        var species = new Species.PlantSpecies(assets);
-        this.speciesList.push(species);
+        this.speciesList.push(new Species.PlantSpecies(assets));
+        this.speciesList.push(new Species.AnimalSpecies(assets));
 
     }
 
@@ -192,16 +192,25 @@ class GameScene implements common.Scene {
 
     function mouseClicked(event: hxd.Event) {
         // check state
-        var pos = translateWorldPosToCell(translateMousePositionToWorld([event.relX, event.relY]));
-        if (!this.world.inBound(pos)) return;
-        if (this.world.cells[pos.x][pos.y].plant != null) return;
+        if (event.button == 0) {
+            var pos = translateWorldPosToCell(translateMousePositionToWorld([event.relX, event.relY]));
+            if (!this.world.inBound(pos)) return;
+            if (this.world.cells[pos.x][pos.y].plant != null) return;
+            this.placeLife(pos, 0);
+        } else {
+            var pos = translateWorldPosToCell(translateMousePositionToWorld([event.relX, event.relY]));
+            if (!this.world.inBound(pos)) return;
+            if (this.world.cells[pos.x][pos.y].animal != null) return;
+            this.placeLife(pos, 1);
+        }
 
-        this.placeLife(pos);
     }
 
-    function placeLife(pos: Point2i) {
-        var life = this.speciesList[0].newLife();
-        this.world.moveLife(life, pos);
+    function placeLife(pos: Point2i, ind: Int = 0) {
+        var life = this.speciesList[ind].newLife();
+        life.x = pos.x;
+        life.y = pos.y;
+        this.world.addLife(life);
     }
 
     function translateMousePositionToWorld(pos: Point2f): Point2f {

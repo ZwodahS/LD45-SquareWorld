@@ -2,6 +2,7 @@
 package gamescene;
 
 import haxe.ds.Vector;
+import common.Direction;
 
 class Life {
 
@@ -56,7 +57,9 @@ class Life {
     public function processExtract(world: World) {}
     public function processProduce(world: World) {}
     public function processReproduce(world: World) {}
-    public function processAge(world: World) {}
+    public function processAge(world: World) {
+        this.age += 1;
+    }
     public function processDie(world: World) {}
 
     public function get_isAlive(): Bool {
@@ -74,7 +77,7 @@ class PlantLife extends Life {
 
     var energyMultiplier: Float = 5.0;
     var energyConsumption: Int = 25;
-    var reproductionChance: Int = 1;
+    var reproductionChance: Int = 10;
     var reproductionEnergyRequirement: Int = 100;
     var reproductionAgeRequirement: Int = 10;
     var ageNutrientsMultiplier = 7;
@@ -125,8 +128,8 @@ class PlantLife extends Life {
     }
 
     override public function processAge(world: World) {
-        this.age += 1;
-        this.energy -= hxd.Math.imin(this.energy, 30);
+        super.processAge(world);
+        this.energy -= hxd.Math.imin(this.energy, this.energyConsumption);
     }
 
     override public function processReproduce(world: World) {
@@ -170,5 +173,79 @@ class PlantLife extends Life {
 }
 
 class AnimalLife extends Life {
+
+    var species: Species.AnimalSpecies;
+
+    var energyMultiplier: Float = 5.0;
+    var nutrientAbsorptionRate = 10;
+    var ageNutrientsMultiplier: Float = 2;
+    var energyConsumption: Int = 25;
+
+    var currentDirection: Direction = Direction.None;
+
     override public function get_type(): String { return "animal"; }
+
+    public function new(sp: Species.AnimalSpecies) {
+        super();
+        this.species = sp;
+        this.energy = 1;
+    }
+
+    function shouldChangeDirection(): Bool {
+        if (this.currentDirection == Direction.None) {
+            return true;
+        }
+        if (Random.int(0, 1000) < 250) {
+            return true;
+        }
+        return false;
+    }
+
+    override public function processMove(world: World) {
+        var cell = world.cells[this.x][this.y];
+        if (cell.nutrients > 0) return;
+
+        if (this.shouldChangeDirection()) {
+            this.changeDirection();
+        }
+
+        var point = common.Direction.Utils.directionToCoord(this.currentDirection);
+        point = [this.x + point.x, this.y + point.y];
+        if (!world.inBound(point)) {
+            this.changeDirection();
+            point = common.Direction.Utils.directionToCoord(this.currentDirection);
+            point = [this.x + point.x, this.y + point.y];
+        }
+        world.moveLife(this, point);
+    }
+
+    function changeDirection() {
+        var availableDirection = [Direction.Left, Direction.Up, Direction.Right, Direction.Down];
+        availableDirection = availableDirection.filter(function(d: Direction) {
+            return d != this.currentDirection && d != common.Direction.Utils.opposite(this.currentDirection);
+        });
+        this.currentDirection = Random.fromArray(availableDirection);
+    }
+
+    override public function processExtract(world: World) {
+        var cell = world.cells[this.x][this.y];
+        var drained:Int = 0;
+        var have = hxd.Math.imin(cell.nutrients, this.nutrientAbsorptionRate - drained);
+
+        drained += have;
+        cell.nutrients -= have;
+
+        this.energy += Math.floor(this.energyMultiplier * drained);
+    }
+    override public function processProduce(world: World) {}
+    override public function processReproduce(world: World) {}
+    override public function processAge(world: World) {
+        super.processAge(world);
+        this.energy -= hxd.Math.imin(this.energy, this.energyConsumption);
+    }
+    override public function processDie(world: World) {
+        var newNutrients = Math.floor(this.age * this.ageNutrientsMultiplier);
+        var cell = world.cells[this.x][this.y];
+        cell.nutrients += newNutrients;
+    }
 }

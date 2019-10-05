@@ -25,7 +25,28 @@ class World {
         }
     }
 
+    public function addLife(life: Life): Bool {
+        var cell = this.cells[life.x][life.y];
+        if (life.type == "animal") {
+            if (cell.animal != null) {
+                return false;
+            }
+            cell.animal = life;
+        } else if (life.type == "plant") {
+            if (cell.plant != null) {
+                return false;
+            }
+            cell.plant = life;
+        } else {
+            return false;
+        }
+        this.worldLayer.add(life.drawable, 0);
+        this.lifeList.add(life);
+        return true;
+    }
+
     public function moveLife(life: Life, pos: Point2i): Bool{
+        if (!this.inBound(pos)) return false;
         var cell = this.cells[pos.x][pos.y];
         if (life.type == "animal") {
             if (cell.animal != null) {
@@ -40,10 +61,20 @@ class World {
         } else {
             return false;
         }
+
+        var currentCell = this.cells[life.x][life.y];
+        if (life.type == "animal") {
+            if (currentCell.animal == life) {
+                currentCell.animal = null;
+            }
+        } else {
+            if (currentCell.plant == life) {
+                currentCell.plant = null;
+            }
+        }
+
         life.x = pos.x;
         life.y = pos.y;
-        this.worldLayer.add(life.drawable, 0);
-        this.lifeList.add(life);
         return true;
     }
 
