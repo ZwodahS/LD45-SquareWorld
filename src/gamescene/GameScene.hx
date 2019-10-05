@@ -2,7 +2,9 @@
 package gamescene;
 
 import haxe.ds.Vector;
-import gamescene.Life;
+import haxe.ds.List;
+import common.Point2i;
+import common.Point2f;
 
 interface Updatable {
     function update(dt: Float): Void ;
@@ -27,39 +29,6 @@ class Updater {
     }
 }
 
-class Grid {
-
-    public var drawable: h2d.Layers;
-    public var x(default, set): Int;
-    public var y(default, set): Int;
-
-    var nutrientsBitmap: h2d.Bitmap;
-
-    public var nutrients: Int;
-
-    public function new() {
-        this.drawable = new h2d.Layers();
-        this.drawable.add(new h2d.Bitmap(h2d.Tile.fromColor(0x241C07, Constants.GridSize, Constants.GridSize)), 0);
-        this.nutrientsBitmap = new h2d.Bitmap(h2d.Tile.fromColor(0xFFFF55, Constants.GridSize, Constants.GridSize));
-        this.drawable.add(nutrientsBitmap, 1);
-        this.nutrients = Math.floor(Math.random() * 10);
-        this.nutrientsBitmap.color.w = Math.min(this.nutrients / 300, 0.3);
-    }
-
-    public function set_x(x: Int): Int {
-        this.x = x;
-        this.drawable.x = x * Constants.GridSize;
-        return this.x;
-    }
-
-    public function set_y(y: Int): Int {
-        this.y = y;
-        this.drawable.y = y * Constants.GridSize;
-        return this.y;
-    }
-}
-
-
 
 class GameScene implements common.Scene {
 
@@ -73,18 +42,23 @@ class GameScene implements common.Scene {
 
     var updater: Updater;
 
-    var world: Vector<Vector<Grid>>;
+    var world: World;
+
+    var timeElapsed: Float = 0;
+    var timePerStep: Float = 0.1;
+
+    var speciesList: Array<Species>;
 
     public function new(assets: common.Assets) {
         this.scene = new h2d.Scene();
         this.assets = assets;
         this.init();
         this.updater = new Updater();
+        this.speciesList = new Array<Species>();
 
-        var species = new Species(assets);
+        var species = new Species.PlantSpecies(assets);
+        this.speciesList.push(species);
 
-        var creature = species.newLife();
-        this.worldLayer.add(creature.drawable, 0);
     }
 
     function init() {
@@ -92,21 +66,43 @@ class GameScene implements common.Scene {
         this.worldLayer = new h2d.Layers(this.scene);
         this.foregroundLayer = new h2d.Layers(this.scene);
 
-        this.world = new Vector<Vector<Grid>>(Constants.WorldWidth);
+        this.world = new World(this.worldLayer, Constants.WorldWidth, Constants.WorldHeight);
         for (x in 0...Constants.WorldWidth) {
-            this.world[x] = new Vector<Grid>(Constants.WorldHeight);
             for (y in 0...Constants.WorldHeight) {
-                var grid = new Grid();
-                grid.x = x;
-                grid.y = y;
-                this.world[x][y] = grid;
-                this.backgroundLayer.add(grid.drawable, 0);
+                this.worldLayer.add(this.world.cells[x][y].drawable, 0);
             }
         }
     }
 
     public function update(dt: Float) {
         updater.update(dt);
+
+        this.timeElapsed += dt;
+        if (timeElapsed > this.timePerStep) {
+            this.timeElapsed -= this.timePerStep;
+
+            for (life in this.world.lifeList) {
+                life.processMove(this.world);
+            }
+            for (life in this.world.lifeList) {
+                life.processExtract(this.world);
+            }
+            for (life in this.world.lifeList) {
+                life.processProduce(this.world);
+            }
+            for (life in this.world.lifeList) {
+                life.processAge(this.world);
+            }
+            for (life in this.world.lifeList) {
+                if (!life.isAlive) {
+                    life.processDie(this.world);
+                    this.world.removeLife(life);
+                }
+            }
+            for (life in this.world.lifeList) {
+                life.processReproduce(this.world);
+            }
+        }
     }
 
     public function render(engine: h3d.Engine) {
@@ -114,6 +110,37 @@ class GameScene implements common.Scene {
     }
 
     public function onEvent(event: hxd.Event) {
+        switch(event.kind) {
+            case hxd.Event.EventKind.ERelease:
+                this.mouseClicked(event);
+            default:
+        }
     }
 
+    function mouseClicked(event: hxd.Event) {
+        // check state
+        var pos = translateWorldPosToCell(translateMousePositionToWorld([
+                    event.relX, event.relY
+        ]));
+        if (!this.world.inBound(pos)) {
+            return;
+        }
+        if (this.world.cells[pos.x][pos.y].plant != null) {
+            return;
+        }
+        this.placeLife(pos);
+    }
+
+    function placeLife(pos: Point2i) {
+        var life = this.speciesList[0].newLife();
+        this.world.moveLife(life, pos);
+    }
+
+    function translateMousePositionToWorld(pos: Point2f): Point2f {
+        return pos;
+    }
+
+    function translateWorldPosToCell(pos: Point2f): Point2i {
+        return [Math.floor(pos.x / Constants.GridSize), Math.floor(pos.y / Constants.GridSize) ];
+    }
 }

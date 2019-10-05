@@ -1,40 +1,66 @@
 {
-    "eyes": {
+    "animal_eyes": {
         "frames": [
             {
                 "src": "images",
-                "key": "eyes0",
+                "key": "animal_eyes0",
                 "color": [255, 255, 255, 255]
             },
             {
                 "src": "images",
-                "key": "eyes1",
+                "key": "animal_eyes1",
                 "color": [255, 255, 255, 255]
             }
         ]
     },
-    "fill": {
+    "animal_fill": {
         "frame": {
             "src": "images",
-            "key": "fill",
+            "key": "animal_fill",
             "color": [255, 255, 255, 255]
         }
     },
-    "skins": {
+    "animal_skins": {
         "frames":[
             {
                 "src": "images",
-                "key": "skins0",
+                "key": "animal_skins0",
                 "color": [255, 255, 255, 255]
             },
             {
                 "src": "images",
-                "key": "skins1",
+                "key": "animal_skins1",
                 "color": [255, 255, 255, 255]
             },
             {
                 "src": "images",
-                "key": "skins2",
+                "key": "animal_skins2",
+                "color": [255, 255, 255, 255]
+            }
+        ]
+    },
+    "plant_fill": {
+        "frame": {
+            "src": "images",
+            "key": "plant_fill",
+            "color": [255, 255, 255, 255]
+        }
+    },
+    "plant_deco": {
+        "frames":[
+            {
+                "src": "images",
+                "key": "plant_deco0",
+                "color": [255, 255, 255, 255]
+            },
+            {
+                "src": "images",
+                "key": "plant_deco1",
+                "color": [255, 255, 255, 255]
+            },
+            {
+                "src": "images",
+                "key": "plant_deco2",
                 "color": [255, 255, 255, 255]
             }
         ]

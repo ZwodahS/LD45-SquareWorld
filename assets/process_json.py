@@ -13,12 +13,16 @@ with open(sys.argv[1]) as f:
 frame_tags = data["meta"]["frameTags"]
 
 definitions = {
-    "fill": [ "fill" ],
-    "skins": [
-        "skins"+str(i) for i in range(0, 3)
+    "animal_fill": [ "animal_fill" ],
+    "animal_skins": [
+        "animal_skins"+str(i) for i in range(0, 3)
     ],
-    "eyes": [
-        "eyes"+str(i) for i in range(0, 2)
+    "animal_eyes": [
+        "animal_eyes"+str(i) for i in range(0, 2)
+    ],
+    "plant_fill": [ "plant_fill" ],
+    "plant_deco": [
+        "plant_deco"+str(i) for i in range(0, 3)
     ],
 }
 frames = data["frames"]
