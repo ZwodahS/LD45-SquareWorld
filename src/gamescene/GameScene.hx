@@ -30,6 +30,68 @@ class Updater {
 }
 
 
+class InfoLayer extends h2d.Layers {
+
+    var currentInfoSpecies: Species;
+
+    var nameData: h2d.Text;
+    var typeData: h2d.Text;
+    var descriptionData: h2d.Text;
+
+    var fontColor: h3d.Vector = new h3d.Vector(0, 0, 0);
+    var titleColor: h3d.Vector = h3d.Vector.fromColor(0xFFFFFFFF);
+    var grey: h3d.Vector = h3d.Vector.fromColor(0xFFAAAAAA);
+    var red: h3d.Vector = h3d.Vector.fromColor(0xFFAC3232);
+    var green: h3d.Vector = h3d.Vector.fromColor(0xFF6ABE30);
+    var blue: h3d.Vector = h3d.Vector.fromColor(0xFF639BFF);
+
+    public function new() {
+        super();
+
+        var fontH1 = hxd.res.DefaultFont.get();
+        fontH1.resizeTo(24);
+        var fontH2 = fontH1.clone();
+        fontH2.resizeTo(16);
+        var fontP = fontH2.clone();
+        fontP.resizeTo(12);
+        var background = new h2d.Bitmap(h2d.Tile.fromColor(0x663931, 500, 500));
+
+        var textOffset: Point2f = [10, 10];
+        this.add(background, 0);
+
+        this.nameData = common.Factory.createH2dText(fontH1, "", textOffset + [10.0, 10.0], this.titleColor);
+        this.add(nameData, 1);
+
+        this.typeData = common.Factory.createH2dText(fontP, "", textOffset + [20.0, 70.0], this.grey);
+        this.add(typeData, 1);
+
+        this.descriptionData = common.Factory.createH2dText(fontH2, "", textOffset + [10.0, 100.0], this.blue);
+        this.add(descriptionData, 1);
+
+        this.y = (Constants.WindowHeight - background.tile.height) / 2 * Constants.globalScale;
+        this.x = (Constants.WindowWidth - 160 - background.tile.width) / 2 * Constants.globalScale;
+        this.scaleX = Constants.globalScale;
+        this.scaleY = Constants.globalScale;
+        this.visible = false;
+    }
+
+    public function drawInfo(species: Species) {
+        if (this.currentInfoSpecies == species) return;
+
+        this.currentInfoSpecies = species;
+        if (this.currentInfoSpecies == null) {
+            this.visible = false;
+            return;
+        }
+
+        this.visible = true;
+
+        this.nameData.text = species.nameString;
+        this.typeData.text = species.typeString;
+        this.descriptionData.text = species.description;
+    }
+}
+
 class Hud {
 
     public var drawable: h2d.Layers;
@@ -37,8 +99,9 @@ class Hud {
     public var speciesList: Array<Species>;
 
     var speciesDrawable: Array<Species.SpCard>;
+    var infoLayer: InfoLayer;
 
-    public function new(assets: common.Assets) {
+    public function new(assets: common.Assets, infoLayer: InfoLayer) {
         this.drawable = new h2d.Layers();
         this.drawable.scaleX = Constants.globalScale;
         this.drawable.scaleY = Constants.globalScale;
@@ -46,6 +109,9 @@ class Hud {
         var hudBG = assets.getAsset("background").tiles[0].getBitmap();
         this.drawable.add(hudBG, 0);
         this.drawable.x = Constants.windowWidth - (160 * Constants.globalScale);
+
+        this.infoLayer = infoLayer;
+
         this.speciesList = new Array<Species>();
         this.speciesDrawable = new Array<Species.SpCard>();
     }
@@ -58,6 +124,10 @@ class Hud {
         this.speciesDrawable.push(species.drawable);
         this.drawable.add(species.drawable, 0);
         this.redraw();
+    }
+
+    public function drawInfo(species: Species) {
+        this.infoLayer.drawInfo(species);
     }
 
     public function redraw() {
@@ -88,6 +158,7 @@ class Hud {
         }
 
         currentHover = newHover;
+        this.infoLayer.drawInfo(currentHover != - 1 ? this.speciesList[currentHover] : null);
 
         if (currentHover == -1) return;
 
@@ -158,16 +229,21 @@ class GameScene implements common.Scene {
     var moveCamera: Array<Bool> = [ false, false, false, false ];
 
     var hud: Hud;
+    var infoLayer: InfoLayer;
     var isPaused: Bool = false;
 
     public function new(assets: common.Assets) {
         this.scene = new h2d.Scene();
         this.camera = new h2d.Camera(this.scene);
+        this.camera.scaleX = Constants.globalScale;
+        this.camera.scaleY = Constants.globalScale;
         this.assets = assets;
         this.init();
         this.updater = new Updater();
         this.speciesList = new Array<Species>();
-        this.hud = new Hud(assets);
+        this.infoLayer = new InfoLayer();
+        this.scene.add(infoLayer, 10);
+        this.hud = new Hud(assets, this.infoLayer);
         this.scene.add(this.hud.drawable, 0);
 
         this.speciesList.push(new Species.Grass(assets));

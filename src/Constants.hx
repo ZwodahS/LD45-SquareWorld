@@ -4,7 +4,10 @@ class Constants {
     public static final WorldWidth = 90;
     public static final WorldHeight= 90;
 
+    public static final WindowWidth = 800;
+    public static final WindowHeight = 600;
+
     public static var globalScale:Float = 1.0;
-    public static var windowWidth:Float = 800;
-    public static var windowHeight:Float = 600;
+    public static var windowWidth:Float = WindowWidth;
+    public static var windowHeight:Float = WindowHeight;
 }

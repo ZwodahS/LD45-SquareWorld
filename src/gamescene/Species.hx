@@ -71,6 +71,10 @@ class Species {
 
     var growRequirement: Array<Int> = [50, 100];
 
+    public var nameString(default, null): String = 'Species Name';
+    public var typeString(default, null): String = 'Species Type';
+    public var description(default, null): String = 'This is the description for the species.\nPut more information here.';
+
     public function new(assets: common.Assets, tiles: common.Assets.Asset2D) {
         this.assets = assets;
         this.tiles = tiles;
@@ -321,7 +325,6 @@ class AnimalSpecies extends Species {
     }
 
     override public function processExtract(life: Life, world: World) {
-        trace(life);
         if (life.energy > this.maxEnergy) {
             return;
         }
