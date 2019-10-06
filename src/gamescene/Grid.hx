@@ -74,7 +74,7 @@ class Grid {
             }
         }
 
-        this.nutrientsAnim.color.a = hxd.Math.clamp(this.nutrients/200, 0.0, 1.0);
+        this.nutrientsAnim.color.a = hxd.Math.clamp(this.nutrients/200, 0.0, 0.8);
 
         if (newNutrientIndex != this.currentNutrientsIndex) {
             this.currentNutrientsIndex = newNutrientIndex;

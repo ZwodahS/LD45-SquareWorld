@@ -22,9 +22,12 @@ class Life {
     public var type(get, null): String;
 
     public var energyGainedThisStep: Int = 0;
+    public var lastProducedAge: Int = 0;
     public var currentDirection: Direction = Direction.None;
     public var stage: Int = 0;
     public var isDead: Bool = false;
+
+    public var numOffspring: Int = 0;
 
     public function new(species: Species) {
         this.species = species;

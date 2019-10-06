@@ -10,4 +10,10 @@ class Constants {
     public static var globalScale:Float = 1.0;
     public static var windowWidth:Float = WindowWidth;
     public static var windowHeight:Float = WindowHeight;
+
+    public static final EnergyPerNutrient: Float = 10.0;
+
+    public static final NutrientPerFood: Float = 1.0;
+
+    public static final NutrientPerMass: Float = 1.0;
 }

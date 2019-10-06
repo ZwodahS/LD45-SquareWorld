@@ -256,15 +256,6 @@ class GameScene implements common.Scene {
         this.speciesList.push(new Species.Bush(assets));
         this.speciesList.push(new Species.Tree(assets));
         this.speciesList.push(new Species.Slime(assets));
-        this.speciesList.push(new Species.Tree(assets));
-        this.speciesList.push(new Species.Slime(assets));
-        this.speciesList.push(new Species.Grass(assets));
-        this.speciesList.push(new Species.Fungus(assets));
-        this.speciesList.push(new Species.Bush(assets));
-        this.speciesList.push(new Species.Tree(assets));
-        this.speciesList.push(new Species.Slime(assets));
-        this.speciesList.push(new Species.Tree(assets));
-        this.speciesList.push(new Species.Slime(assets));
 
         for (s in this.speciesList) {
             this.hud.addSpecies(s);
