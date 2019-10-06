@@ -34,7 +34,7 @@ class Grid {
         this.drawable.add(this.nutrientsAnim, 1);
 
         this.nutrients = Math.floor(Math.random() * 80);
-        this.food = hxd.Math.imax(Math.floor(Math.random() * 50) - 45, 0) * 5;
+        this.food = hxd.Math.imax(Math.floor(Math.random() * 50) - 48, 0) * 10;
         updateBitmap();
     }
 
