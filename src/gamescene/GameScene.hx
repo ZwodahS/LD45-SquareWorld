@@ -36,7 +36,7 @@ class Hud {
 
     public var speciesList: Array<Species>;
 
-    var speciesDrawable: Array<h2d.Object>;
+    var speciesDrawable: Array<Species.SpCard>;
 
     public function new(assets: common.Assets) {
         this.drawable = new h2d.Layers();
@@ -47,7 +47,7 @@ class Hud {
         this.drawable.add(hudBG, 0);
         this.drawable.x = Constants.windowWidth - (160 * Constants.globalScale);
         this.speciesList = new Array<Species>();
-        this.speciesDrawable = new Array<h2d.Object>();
+        this.speciesDrawable = new Array<Species.SpCard>();
     }
 
     public function addSpecies(species: Species) {
@@ -69,7 +69,62 @@ class Hud {
         }
     }
 
+    var currentSelect: Int = -1;
+    var currentHover: Int = -1;
+
+    public function selectedSpecies(): Species {
+        if (this.currentSelect == -1) return null;
+
+        return speciesList[this.currentSelect];
+    }
+
+    public function mouseMoved(event: hxd.Event) {
+        var newHover = this.findSelectedInd(new h2d.col.Point(event.relX, event.relY));
+
+        if (newHover == currentHover) return;
+
+        if (currentHover != -1) {
+            this.speciesDrawable[currentHover].unhover();
+        }
+
+        currentHover = newHover;
+
+        if (currentHover == -1) return;
+
+        this.speciesDrawable[currentHover].hover();
+    }
+
+    public function mouseClicked(event: hxd.Event) {
+        if (event.button == 0) {
+            var card = this.findSelectedInd(new h2d.col.Point(event.relX, event.relY));
+            if (card == -1) {
+            } else {
+                if (currentSelect != -1) this.speciesDrawable[currentSelect].unselect();
+
+                if (card == this.currentSelect) {
+                    currentSelect = -1;
+                } else {
+                    currentSelect = card;
+                    this.speciesDrawable[currentSelect].select();
+                }
+            }
+        }
+    }
+
+    function findSelectedInd(point: h2d.col.Point): Int {
+        var newHover = -1;
+        var ind = 0;
+        for (item in this.speciesDrawable) {
+            if (item.getBounds().contains(point)) {
+                newHover = ind;
+                break;
+            }
+            ind++;
+        }
+        return newHover;
+    }
 }
+
 
 
 class GameScene implements common.Scene {
@@ -209,26 +264,27 @@ class GameScene implements common.Scene {
     }
 
     function mouseMoved(event: hxd.Event) {
-        if (this.mouseDownEvent == null) return;
-
-        if (this.startDrag == false) {
-            var diff = (
-                    Math.abs(event.relX - this.mouseDownEvent.relX) +
-                    Math.abs(event.relY - this.mouseDownEvent.relY)
-            );
-            if (diff > 20) {
-                this.startDrag = true;
+        this.hud.mouseMoved(event);
+        if (this.mouseDownEvent != null) {
+            if (this.startDrag == false) {
+                var diff = (
+                        Math.abs(event.relX - this.mouseDownEvent.relX) +
+                        Math.abs(event.relY - this.mouseDownEvent.relY)
+                );
+                if (diff > 20) {
+                    this.startDrag = true;
+                }
             }
-        }
 
-        if (this.startDrag) {
-            var diff = new Point2f(
-                event.relX - this.mouseDownEvent.relX,
-                event.relY - this.mouseDownEvent.relY
-            );
-            this.drag(diff);
-            this.mouseDownEvent.relX = event.relX;
-            this.mouseDownEvent.relY = event.relY;
+            if (this.startDrag) {
+                var diff = new Point2f(
+                    event.relX - this.mouseDownEvent.relX,
+                    event.relY - this.mouseDownEvent.relY
+                );
+                this.drag(diff);
+                this.mouseDownEvent.relX = event.relX;
+                this.mouseDownEvent.relY = event.relY;
+            }
         }
     }
 
@@ -244,17 +300,16 @@ class GameScene implements common.Scene {
             this.startDrag = false;
             return;
         }
-        // check state
-        if (event.button == 0) {
-            var pos = translateWorldPosToCell(translateMousePositionToWorld([event.relX, event.relY]));
-            if (!this.world.inBound(pos)) return;
-            if (this.world.cells[pos.x][pos.y].plant != null) return;
-            this.placeLife(pos, 0);
+        if (event.relX > ((800 - 160) * Constants.globalScale)) {
+            this.hud.mouseClicked(event);
         } else {
-            var pos = translateWorldPosToCell(translateMousePositionToWorld([event.relX, event.relY]));
-            if (!this.world.inBound(pos)) return;
-            if (this.world.cells[pos.x][pos.y].animal != null) return;
-            this.placeLife(pos, 1);
+            // check state
+            if (event.button == 0) {
+                var pos = translateWorldPosToCell(translateMousePositionToWorld([event.relX, event.relY]));
+                if (!this.world.inBound(pos)) return;
+                if (this.world.cells[pos.x][pos.y].plant != null) return;
+                this.placeLife(pos);
+            }
         }
     }
 
@@ -313,8 +368,11 @@ class GameScene implements common.Scene {
         }
     }
 
-    function placeLife(pos: Point2i, ind: Int = 0) {
-        var life = this.speciesList[ind].newLife();
+    function placeLife(pos: Point2i) {
+        var sp = this.hud.selectedSpecies();
+        if (sp == null) return;
+
+        var life = sp.newLife();
         life.x = pos.x;
         life.y = pos.y;
         this.world.addLife(life);

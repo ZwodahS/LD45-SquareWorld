@@ -1,11 +1,69 @@
 
 package gamescene;
 
+class SpCard extends h2d.Layers {
+
+    var spcard: h2d.Bitmap;
+
+    var isHovered: Bool = false;
+    var isSelected: Bool = false;
+
+    public function new(assets: common.Assets) {
+        super();
+        this.spcard = assets.getAsset("spcard").tiles[0].getBitmap();
+        this.add(spcard, 0);
+    }
+
+    public function unhover() {
+        if (!this.isHovered) return;
+
+        this.scaleX = 1.0;
+        this.scaleX = 1.0;
+        this.x += 7;
+        this.y += 4;
+        this.isHovered = false;
+    }
+
+    public function hover() {
+        if (this.isHovered || this.isSelected) return;
+
+        this.scaleX = 1.1;
+        this.scaleX = 1.1;
+        this.x -= 7;
+        this.y -= 4;
+
+        this.isHovered = true;
+    }
+
+    public function select() {
+        if (this.isSelected) return;
+        if (this.isHovered) this.unhover();
+
+        this.spcard.color = new h3d.Vector(1.0, 1.0, 0.6);
+        this.isSelected = true;
+    }
+
+    public function unselect() {
+        if (!this.isSelected) return;
+        this.spcard.color = new h3d.Vector(1.0, 1.0, 1.0);
+        this.isSelected = false;
+    }
+
+    public function toggleSelect(): Bool {
+        if (this.isSelected) {
+            this.unselect();
+        } else {
+            this.select();
+        }
+        return this.isSelected;
+    }
+}
+
 class Species {
 
     var assets: common.Assets;
 
-    public var drawable(get, null): h2d.Object;
+    public var drawable(get, null): SpCard;
 
     public function new(assets: common.Assets) {
         this.assets = assets;
@@ -15,7 +73,7 @@ class Species {
         return null;
     }
 
-    public function get_drawable(): h2d.Object {
+    public function get_drawable(): SpCard {
         return null;
     }
 }
@@ -33,7 +91,7 @@ class PlantSpecies extends Species{
     public var ageNutrientsMultiplier(default, null):Float = 7;
     public var nutrientAbsorptionRate(default, null):Int = 10;
 
-    public var _drawable: h2d.Layers;
+    public var _drawable: SpCard;
 
     public function new(assets: common.Assets) {
         super(assets);
@@ -46,10 +104,8 @@ class PlantSpecies extends Species{
         this._drawable = this.makeCard();
     }
 
-    function makeCard(): h2d.Layers {
-        var layer = new h2d.Layers();
-        var spcard = this.assets.getAsset("spcard").tiles[0].getBitmap();
-        layer.add(spcard, 0);
+    function makeCard(): SpCard {
+        var layer = new SpCard(this.assets);
         layer.add(this.makeLifeImage(), 1);
         return layer;
     }
@@ -74,7 +130,7 @@ class PlantSpecies extends Species{
         return life;
     }
 
-    override public function get_drawable(): h2d.Object {
+    override public function get_drawable(): SpCard {
         return _drawable;
     }
 }
@@ -94,7 +150,7 @@ class AnimalSpecies extends Species {
     public var reproductionAgeRequirement(default, null): Int = 10;
     public var maxEnergy(default, null): Int = 500;
 
-    public var _drawable: h2d.Layers;
+    public var _drawable: SpCard;
 
     public function new(assets: common.Assets) {
         super(assets);
@@ -109,10 +165,8 @@ class AnimalSpecies extends Species {
         this._drawable = this.makeCard();
     }
 
-    function makeCard(): h2d.Layers {
-        var layer = new h2d.Layers();
-        var spcard = this.assets.getAsset("spcard").tiles[0].getBitmap();
-        layer.add(spcard, 0);
+    function makeCard(): SpCard {
+        var layer = new SpCard(this.assets);
         layer.add(this.makeLifeImage(), 1);
         return layer;
     }
@@ -139,7 +193,7 @@ class AnimalSpecies extends Species {
         return life;
     }
 
-    override public function get_drawable(): h2d.Object {
+    override public function get_drawable(): SpCard {
         return _drawable;
     }
 }
