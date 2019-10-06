@@ -330,8 +330,9 @@ class GameScene implements common.Scene {
             this.camera.scaleX -= Math.max(-0.1, event.wheelDelta*0.01) * Constants.globalScale;
             this.camera.scaleY -= Math.max(-0.1, event.wheelDelta*0.01) * Constants.globalScale;
         }
-        this.camera.scaleX = hxd.Math.clamp(this.camera.scaleX, Constants.globalScale*0.5, Constants.globalScale*1.5);
-        this.camera.scaleY = hxd.Math.clamp(this.camera.scaleY, Constants.globalScale*0.5, Constants.globalScale*1.5);
+
+        this.camera.scaleX = hxd.Math.clamp(this.camera.scaleX, Constants.globalScale-0.5, Constants.globalScale+0.5);
+        this.camera.scaleY = hxd.Math.clamp(this.camera.scaleY, Constants.globalScale-0.5, Constants.globalScale+0.5);
         this.alignCamera();
     }
 
