@@ -1,8 +1,8 @@
 
 class Constants {
     public static final GridSize = 24;
-    public static final WorldWidth = 30;
-    public static final WorldHeight= 30;
+    public static final WorldWidth = 60;
+    public static final WorldHeight= 60;
 
     public static var globalScale:Float = 1.0;
     public static var windowWidth:Float = 800;

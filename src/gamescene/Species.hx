@@ -5,11 +5,17 @@ class Species {
 
     var assets: common.Assets;
 
+    public var drawable(get, null): h2d.Object;
+
     public function new(assets: common.Assets) {
         this.assets = assets;
     }
 
     public function newLife(): Life {
+        return null;
+    }
+
+    public function get_drawable(): h2d.Object {
         return null;
     }
 }
@@ -27,6 +33,8 @@ class PlantSpecies extends Species{
     public var ageNutrientsMultiplier(default, null):Float = 7;
     public var nutrientAbsorptionRate(default, null):Int = 10;
 
+    public var _drawable: h2d.Layers;
+
     public function new(assets: common.Assets) {
         super(assets);
 
@@ -34,6 +42,29 @@ class PlantSpecies extends Species{
         this.fill.color = new h3d.Vector(0.1, 0.8, 0.1);
         this.deco = assets.getAsset("plant_deco").tiles[common.MathUtils.random(0, 2)].copy();
         this.deco.color = new h3d.Vector(1, 1, 1, 0.4);
+
+        this._drawable = this.makeCard();
+    }
+
+    function makeCard(): h2d.Layers {
+        var layer = new h2d.Layers();
+        var spcard = this.assets.getAsset("spcard").tiles[0].getBitmap();
+        layer.add(spcard, 0);
+        layer.add(this.makeLifeImage(), 1);
+        return layer;
+    }
+
+    function makeLifeImage(): h2d.Layers {
+        var layer = new h2d.Layers();
+        var f = this.fill.getBitmap();
+        layer.add(f, 1);
+        var d = this.deco.getBitmap();
+        layer.add(d, 2);
+        layer.scaleX = 1.5;
+        layer.scaleY = 1.5;
+        layer.x = 6;
+        layer.y = 6;
+        return layer;
     }
 
     override public function newLife(): Life {
@@ -41,6 +72,10 @@ class PlantSpecies extends Species{
         life.drawable.add(this.fill.getBitmap(), 0);
         life.drawable.add(this.deco.getBitmap(), 1);
         return life;
+    }
+
+    override public function get_drawable(): h2d.Object {
+        return _drawable;
     }
 }
 
@@ -59,6 +94,8 @@ class AnimalSpecies extends Species {
     public var reproductionAgeRequirement(default, null): Int = 10;
     public var maxEnergy(default, null): Int = 500;
 
+    public var _drawable: h2d.Layers;
+
     public function new(assets: common.Assets) {
         super(assets);
 
@@ -68,6 +105,30 @@ class AnimalSpecies extends Species {
         this.skin.color = new h3d.Vector(1, 1, 1, 0.4);
         this.eye = assets.getAsset("animal_eyes").tiles[common.MathUtils.random(0, 1)].copy();
         this.eye.color = new h3d.Vector(0, 0, 0, 0.4);
+
+        this._drawable = this.makeCard();
+    }
+
+    function makeCard(): h2d.Layers {
+        var layer = new h2d.Layers();
+        var spcard = this.assets.getAsset("spcard").tiles[0].getBitmap();
+        layer.add(spcard, 0);
+        layer.add(this.makeLifeImage(), 1);
+        return layer;
+    }
+
+    function makeLifeImage(): h2d.Layers {
+        var layer = new h2d.Layers();
+        var f = this.fill.getBitmap();
+        layer.add(f, 1);
+        var s = this.skin.getBitmap();
+        layer.add(s, 2);
+        var e = this.eye.getBitmap();
+        layer.scaleX = 1.5;
+        layer.scaleY = 1.5;
+        layer.x = 6;
+        layer.y = 6;
+        return layer;
     }
 
     override public function newLife(): Life {
@@ -76,5 +137,9 @@ class AnimalSpecies extends Species {
         life.drawable.add(this.skin.getBitmap(), 1);
         life.drawable.add(this.eye.getBitmap(), 2);
         return life;
+    }
+
+    override public function get_drawable(): h2d.Object {
+        return _drawable;
     }
 }

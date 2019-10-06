@@ -34,6 +34,10 @@ class Hud {
 
     public var drawable: h2d.Layers;
 
+    public var speciesList: Array<Species>;
+
+    var speciesDrawable: Array<h2d.Object>;
+
     public function new(assets: common.Assets) {
         this.drawable = new h2d.Layers();
         this.drawable.scaleX = Constants.globalScale;
@@ -42,11 +46,27 @@ class Hud {
         var hudBG = assets.getAsset("background").tiles[0].getBitmap();
         this.drawable.add(hudBG, 0);
         this.drawable.x = Constants.windowWidth - (160 * Constants.globalScale);
+        this.speciesList = new Array<Species>();
+        this.speciesDrawable = new Array<h2d.Object>();
+    }
 
-        var spCard = assets.getAsset("spcard").tiles[0].getBitmap();
-        this.drawable.add(spCard, 1);
-        spCard.x = 10;
-        spCard.y = 200;
+    public function addSpecies(species: Species) {
+        if (this.speciesList.indexOf(species) != -1) {
+            return;
+        }
+        this.speciesList.push(species);
+        this.speciesDrawable.push(species.drawable);
+        this.drawable.add(species.drawable, 0);
+        this.redraw();
+    }
+
+    public function redraw() {
+        var ind = 0;
+        for (d in this.speciesDrawable) {
+            d.x = 10;
+            d.y = 180 + (ind * 60);
+            ind++;
+        }
     }
 
 }
@@ -88,6 +108,16 @@ class GameScene implements common.Scene {
 
         this.speciesList.push(new Species.PlantSpecies(assets));
         this.speciesList.push(new Species.AnimalSpecies(assets));
+        this.speciesList.push(new Species.AnimalSpecies(assets));
+        this.speciesList.push(new Species.AnimalSpecies(assets));
+        this.speciesList.push(new Species.AnimalSpecies(assets));
+        this.speciesList.push(new Species.AnimalSpecies(assets));
+        this.speciesList.push(new Species.AnimalSpecies(assets));
+        this.speciesList.push(new Species.AnimalSpecies(assets));
+
+        for (s in this.speciesList) {
+            this.hud.addSpecies(s);
+        }
 
     }
 
