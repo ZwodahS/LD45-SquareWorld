@@ -131,7 +131,7 @@ class Species {
         return layer;
     }
 
-    public function shouldDie(life: Life): Bool {
+    public function shouldDie(life: Life, world: World): Bool {
         return false;
     }
 
@@ -437,6 +437,10 @@ class Grass extends PlantSpecies {
     override public function getReproductionChance(life: Life, world: World): Int {
         return this.reproductionChance + (life.energyGainedThisStep == 0 ? 10 : 0);
     }
+
+    override public function shouldDie(life: Life, world: World): Bool {
+        return life.age > 200;
+    }
 }
 
 class AnimalSpecies extends Species {
@@ -610,7 +614,8 @@ class Slime extends AnimalSpecies {
                 'Slime is a nutrient absorbing creature.\n' +
                 'Most of what is absorbed is stored in itself.\n' +
                 'When the slime gets bigger, it will split into multiple slime.\n'+
-                'The slime will explode into nutrients if it reaches age 200\nif it did not split by then\n'
+                'The slime will explode into nutrients if it reaches age 200\nif it did not split by then\n'+
+                'When a slime dies, the explosion will cause other slime to also die'
         );
     }
 
@@ -628,7 +633,7 @@ class Slime extends AnimalSpecies {
     }
 
     override public function getReproductionChance(life: Life, world: World): Int {
-        return Math.floor(life.mass / 5);
+        return Math.floor(life.mass / 10);
     }
 
     override public function shouldMove(life: Life, world: World): Bool {
@@ -645,10 +650,19 @@ class Slime extends AnimalSpecies {
         life.energy += Math.floor(this.energyMultiplier * drained);
     }
 
-    override public function shouldDie(life: Life): Bool {
+    override public function shouldDie(life: Life, world: World): Bool {
         return life.age > 200;
     }
 
+    override public function processDie(life: Life, world: World) {
+        super.processDie(life, world);
+        var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], this.dieNutrientsRange);
+        for (cell in cellList) {
+            if (cell.animal != null && cell.animal.species.nameString == "Slime") {
+                cell.animal.die();
+            }
+        }
+    }
 }
 
 class Rodent extends AnimalSpecies {
@@ -886,7 +900,7 @@ class Insect extends AnimalSpecies {
         return newLife;
     }
 
-    override public function shouldDie(life: Life): Bool {
+    override public function shouldDie(life: Life, world: World): Bool {
         return life.energy > 2500 || life.mass > 300;
     }
 }

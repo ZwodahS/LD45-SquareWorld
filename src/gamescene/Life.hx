@@ -100,8 +100,8 @@ class Life {
         return this.species.genericType;
     }
 
-    public function shouldDie(): Bool {
-        return this.species.shouldDie(this);
+    public function shouldDie(world: World): Bool {
+        return this.species.shouldDie(this, world);
     }
 }
 

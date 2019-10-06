@@ -345,7 +345,7 @@ class GameScene implements common.Scene {
             life.processGrowth(this.world);
         }
         for (life in this.world.lifeList) {
-            if (!life.isAlive || life.shouldDie()) {
+            if (!life.isAlive || life.shouldDie(this.world)) {
                 life.processDie(this.world);
                 this.world.removeLife(life);
             }
@@ -363,9 +363,9 @@ class GameScene implements common.Scene {
             this.timeElapsed -= this.timePerStep;
             if (!this.isPaused) {
                 this.simulate();
+                this.stepCounter += 1;
+                this.stepCounterText.text = 'Time: ${this.stepCounter}';
             }
-            this.stepCounter += 1;
-            this.stepCounterText.text = 'Time: ${this.stepCounter}';
         }
         var camMove = new Point2f(0, 0);
         if (moveCamera[0]) camMove.y += dt * 500;
