@@ -217,7 +217,7 @@ class PlantSpecies extends Species{
 
     override function processGrowth(life: Life, world: World) {
         super.processGrowth(life, world);
-        if (life.energyConsumedThisStep > 0) {
+        if (life.energyConsumedThisStep == this.consumptionRate) {
             life.mass += massPerTurn;
         }
         if (this.maxMass != -1) {
@@ -512,7 +512,7 @@ class AnimalSpecies extends Species {
 
     override function processGrowth(life: Life, world: World) {
         super.processGrowth(life, world);
-        if (life.energyConsumedThisStep > 0) {
+        if (life.energyConsumedThisStep == this.consumptionRate) {
             life.mass += massPerTurn;
         }
         if (this.maxMass != -1) {
@@ -565,7 +565,6 @@ class AnimalSpecies extends Species {
 
     override public function processDie(life: Life, world: World) {
         var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], this.dieNutrientsRange);
-        cellList.push(world.cells[life.x][life.y]);
         Random.shuffle(cellList);
         var newNutrients = life.mass * Constants.NutrientPerMass + Math.floor(life.energy / Constants.EnergyPerNutrient);
         var spread = Math.floor(newNutrients / 2 / cellList.length);
@@ -603,11 +602,11 @@ class Slime extends AnimalSpecies {
 
         this.energyMultiplier = 10.0;
         this.nutrientAbsorptionRate = 50;
-        this.consumptionRate = 100;
+        this.consumptionRate = 200;
 
         this.maxEnergy = 10000;
         this.maxMass = -1;
-        this.massPerTurn = 9;
+        this.massPerTurn = 5;
         this.dieNutrientsRange = 4;
 
         this.description = (
@@ -704,6 +703,10 @@ class Rodent extends AnimalSpecies {
         life.energy += Math.floor(this.energyMultiplier * drained);
     }
 
+    override public function shouldDie(life: Life, world: World): Bool {
+        return life.age > 300;
+    }
+
     override function processProduce(life: Life, world: World) {
         if (life.energy == 0) return;
 
@@ -787,8 +790,8 @@ class Insect extends AnimalSpecies {
 
         this.consumptionRate = 20;
         this.maxEnergy = 5000;
-        this.massPerTurn = 2;
-        this.energyMultiplier = 50;
+        this.massPerTurn = 1;
+        this.energyMultiplier = 20;
 
         this.reproductionChance = 50;
         this.reproductionEnergyRequirement = 1000;
@@ -841,8 +844,12 @@ class Insect extends AnimalSpecies {
             return;
         }
 
-        if (life.targetLocation != null && (
-                    life.x == life.targetLocation.x && life.y == life.targetLocation.y)) {
+        if (life.targetLocation != null &&
+                (
+                    life.x == life.targetLocation.x && life.y == life.targetLocation.y ||
+                    world.cells[life.targetLocation.x][life.targetLocation.y].animal != null
+                )
+            ) {
             // reach but no food.
             life.targetLocation = null;
         }
@@ -858,7 +865,7 @@ class Insect extends AnimalSpecies {
             });
 
             for (p in points) {
-                if (this.haveFood(world.cells[p.x][p.y])) {
+                if (this.haveFood(world.cells[p.x][p.y]) && world.cells[p.x][p.y].animal == null) {
                     life.targetLocation = p;
                     break;
                 }
@@ -905,7 +912,7 @@ class Insect extends AnimalSpecies {
     }
 
     override public function shouldDie(life: Life, world: World): Bool {
-        return life.energy > 2500 || life.mass > 300;
+        return life.energy > 2500 || life.mass > 300 || life.age > 400;
     }
 }
 
