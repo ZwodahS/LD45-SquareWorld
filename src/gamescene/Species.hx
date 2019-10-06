@@ -386,7 +386,7 @@ class Fungus extends PlantSpecies {
         super(assets, assets.getAsset("fungus"));
 
         this.nameString = "Fungus";
-        this.typeString = "plant";
+        this.typeString = "fungus";
 
         this.extractRange = 1;
         this.energyMultiplier = 10.0;
@@ -453,14 +453,15 @@ class AnimalSpecies extends Species {
     var skin: common.Assets.Tile;
     var eye: common.Assets.Tile;
 
-    public var energyMultiplier(default, null): Float = 5.0;
-    public var nutrientAbsorptionRate(default, null):Int = 10;
-    public var ageNutrientsMultiplier(default, null): Float = 2;
-    public var energyConsumption(default, null): Int = 25;
-    public var reproductionChance(default, null): Int = 1;
-    public var reproductionEnergyRequirement(default, null): Int = 100;
-    public var reproductionAgeRequirement(default, null): Int = 10;
-    public var maxEnergy(default, null): Int = 500;
+    public var energyMultiplier(default, null): Float = 10.0;
+    public var nutrientAbsorptionRate(default, null):Int = 20;
+    public var energyConsumption(default, null): Int = 50;
+    public var reproductionChance(default, null): Int = 10;
+    public var reproductionEnergyRequirement(default, null): Int = 0;
+    public var reproductionAgeRequirement(default, null): Int = 100;
+    public var maxEnergy(default, null): Int = 5000;
+    public var maxMass: Int = 1000;
+    public var massPerTurn: Int = 3;
 
     public var _drawable: SpCard;
 
@@ -500,6 +501,18 @@ class AnimalSpecies extends Species {
         world.moveLife(life, point);
     }
 
+    override function processGrowth(life: Life, world: World) {
+        super.processGrowth(life, world);
+        var consume = hxd.Math.imin(life.energy, this.energyConsumption);
+        life.energy -= consume;
+        if (consume > 0) {
+            life.mass += massPerTurn;
+        }
+        if (this.maxMass != -1) {
+            life.mass = hxd.Math.imin(life.mass, this.maxMass);
+        }
+    }
+
     function changeDirection(life: Life) {
         var availableDirection = [Direction.Left, Direction.Up, Direction.Right, Direction.Down];
         availableDirection = availableDirection.filter(function(d: Direction) {
@@ -533,7 +546,7 @@ class AnimalSpecies extends Species {
             return;
         }
 
-        var chance = this.reproductionChance + (life.energy/200);
+        var chance = this.getReproductionChance(life, world);
         if (Random.int(0, 1000) > chance) {
             return;
         }
@@ -546,29 +559,75 @@ class AnimalSpecies extends Species {
                 continue;
             }
 
-            var life = this.newLife();
-            life.x = cell.x;
-            life.y = cell.y;
-            world.addLife(life);
+            var newLife = this.reproduce(life);
+            newLife.x = cell.x;
+            newLife.y = cell.y;
+            world.addLife(newLife);
             break;
         }
-
     }
 
-    override public function processGrowth(life: Life, world: World) {
-        super.processGrowth(life, world);
-        life.energy -= hxd.Math.imin(life.energy, this.energyConsumption);
+    public function reproduce(life: Life): Life {
+        return this.newLife();
     }
 
     override public function processDie(life: Life, world: World) {
-        var newNutrients = Math.floor(life.age * this.ageNutrientsMultiplier);
-        var cell = world.cells[life.x][life.y];
-        cell.nutrients += newNutrients;
+        var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], 2);
+        cellList.push(world.cells[life.x][life.y]);
+        Random.shuffle(cellList);
+        var newNutrients = life.mass * Constants.NutrientPerMass;
+        var spread = Math.floor(newNutrients / 2 / cellList.length);
+        // 50% evenly spread
+        for (cell in cellList) {
+            cell.nutrients += spread;
+        }
+        spread = Math.floor(newNutrients / 2 / 10);
+        for (i in 0...10) {
+            Random.fromArray(cellList).nutrients += spread;
+        }
+    }
+
+    public function getReproductionChance(life: Life, world: World): Int {
+        return this.reproductionChance;
     }
 }
 
 class Slime extends AnimalSpecies {
     public function new(assets: common.Assets) {
         super(assets, assets.getAsset("slime"));
+
+        this.nameString = "Slime";
+        this.typeString = "unknown";
+
+        this.energyMultiplier = 10.0;
+        this.nutrientAbsorptionRate = 50;
+        this.energyConsumption = 100;
+
+        this.maxEnergy = 10000;
+        this.maxMass = -1;
+        this.massPerTurn = 9;
+
+        this.description = (
+                'Slime is a nutrient absorbing creature.\n' +
+                'Most of what is absorbed is stored in itself.\n' +
+                'When the slime gets bigger, it will split into multiple slime'
+        );
+    }
+
+    override function reproduce(life: Life): Life {
+        var newLife = this.newLife();
+        life.age = 0;
+        newLife.age = 0;
+        life.mass = Math.floor(life.mass/2);
+        newLife.mass = life.mass;
+        life.energy = Math.floor(life.energy/2);
+        newLife.mass = life.energy;
+        life.drawable.removeChildren();
+        life.drawable.add(this.tiles.getBitmap(0), 0);
+        return newLife;
+    }
+
+    override public function getReproductionChance(life: Life, world: World): Int {
+        return Math.floor(life.mass / 5);
     }
 }
