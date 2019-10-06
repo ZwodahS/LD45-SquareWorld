@@ -24,6 +24,11 @@ definitions = {
     "plant_deco": [
         "plant_deco"+str(i) for i in range(0, 3)
     ],
+
+    "tree": [ "tree" + str(i) for i in range(0, 3) ],
+    "fungus": [ "fungus" + str(i) for i in range(0, 3) ],
+    "bush": [ "bush" + str(i) for i in range(0, 3) ],
+    "grass": [ "grass" + str(i) for i in range(0, 3) ],
 }
 frames = data["frames"]
 processed_frames = {}

@@ -78,5 +78,69 @@
             "key": "spcard",
             "color": [255, 255, 255, 255]
         }
+    },
+    "tree": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "tree0"
+            },
+            {
+                "src": "images",
+                "key": "tree1"
+            },
+            {
+                "src": "images",
+                "key": "tree2"
+            }
+        ]
+    },
+    "bush": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "bush0"
+            },
+            {
+                "src": "images",
+                "key": "bush1"
+            },
+            {
+                "src": "images",
+                "key": "bush2"
+            }
+        ]
+    },
+    "fungus": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "fungus0"
+            },
+            {
+                "src": "images",
+                "key": "fungus1"
+            },
+            {
+                "src": "images",
+                "key": "fungus2"
+            }
+        ]
+    },
+    "grass": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "grass0"
+            },
+            {
+                "src": "images",
+                "key": "grass1"
+            },
+            {
+                "src": "images",
+                "key": "grass2"
+            }
+        ]
     }
 }

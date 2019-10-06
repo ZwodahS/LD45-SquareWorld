@@ -97,6 +97,105 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
     "sourceSize": { "w": 24, "h": 24 },
     "duration": 100
+   },
+   {
+    "filename": "images 11.aseprite",
+    "frame": { "x": 24, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 12.aseprite",
+    "frame": { "x": 48, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 13.aseprite",
+    "frame": { "x": 72, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 14.aseprite",
+    "frame": { "x": 96, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 15.aseprite",
+    "frame": { "x": 0, "y": 72, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 16.aseprite",
+    "frame": { "x": 24, "y": 72, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 17.aseprite",
+    "frame": { "x": 48, "y": 72, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 18.aseprite",
+    "frame": { "x": 72, "y": 72, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 19.aseprite",
+    "frame": { "x": 96, "y": 72, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 20.aseprite",
+    "frame": { "x": 0, "y": 96, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 21.aseprite",
+    "frame": { "x": 24, "y": 96, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
    }
  ],
  "meta": {
@@ -111,7 +210,11 @@
    { "name": "animal_skins", "from": 1, "to": 3, "direction": "forward" },
    { "name": "animal_eyes", "from": 4, "to": 5, "direction": "forward" },
    { "name": "plant_fill", "from": 6, "to": 6, "direction": "forward" },
-   { "name": "plant_deco", "from": 7, "to": 9, "direction": "forward" }
+   { "name": "plant_deco", "from": 7, "to": 9, "direction": "forward" },
+   { "name": "bush", "from": 10, "to": 12, "direction": "forward" },
+   { "name": "tree", "from": 13, "to": 15, "direction": "forward" },
+   { "name": "fungus", "from": 16, "to": 18, "direction": "forward" },
+   { "name": "grass", "from": 19, "to": 21, "direction": "forward" }
   ],
   "layers": [
    { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }

@@ -19,7 +19,7 @@ class SpCard extends h2d.Layers {
 
         this.scaleX = 1.0;
         this.scaleX = 1.0;
-        this.x += 7;
+        this.x += 3;
         this.y += 4;
         this.isHovered = false;
     }
@@ -29,7 +29,7 @@ class SpCard extends h2d.Layers {
 
         this.scaleX = 1.1;
         this.scaleX = 1.1;
-        this.x -= 7;
+        this.x -= 3;
         this.y -= 4;
 
         this.isHovered = true;
@@ -80,8 +80,7 @@ class Species {
 
 class PlantSpecies extends Species{
 
-    var fill: common.Assets.Tile;
-    var deco: common.Assets.Tile;
+    var tiles: common.Assets.Asset2D;
 
     public var energyMultiplier(default, null): Float = 5.0;
     public var energyConsumption(default, null): Int = 25;
@@ -93,45 +92,62 @@ class PlantSpecies extends Species{
 
     public var _drawable: SpCard;
 
-    public function new(assets: common.Assets) {
+    public function new(assets: common.Assets, tiles: common.Assets.Asset2D) {
         super(assets);
-
-        this.fill = assets.getAsset("plant_fill").tiles[0].copy();
-        this.fill.color = new h3d.Vector(0.1, 0.8, 0.1);
-        this.deco = assets.getAsset("plant_deco").tiles[common.MathUtils.random(0, 2)].copy();
-        this.deco.color = new h3d.Vector(1, 1, 1, 0.4);
-
+        this.tiles = tiles;
         this._drawable = this.makeCard();
     }
 
     function makeCard(): SpCard {
         var layer = new SpCard(this.assets);
-        layer.add(this.makeLifeImage(), 1);
+        var l = this.makeLifeImage();
+        l.x = 12; l.y = 6;
+        layer.add(l, 1);
         return layer;
     }
 
     function makeLifeImage(): h2d.Layers {
         var layer = new h2d.Layers();
-        var f = this.fill.getBitmap();
-        layer.add(f, 1);
-        var d = this.deco.getBitmap();
-        layer.add(d, 2);
+        var bitmap = this.tiles.getBitmap(2);
+        layer.add(bitmap, 0);
         layer.scaleX = 1.5;
         layer.scaleY = 1.5;
-        layer.x = 6;
-        layer.y = 6;
         return layer;
     }
 
     override public function newLife(): Life {
         var life = new Life.PlantLife(this);
-        life.drawable.add(this.fill.getBitmap(), 0);
-        life.drawable.add(this.deco.getBitmap(), 1);
+        var bitmap = this.tiles.getBitmap(2);
+        life.drawable.add(bitmap, 0);
         return life;
     }
 
     override public function get_drawable(): SpCard {
         return _drawable;
+    }
+}
+
+class Tree extends PlantSpecies {
+    public function new(assets: common.Assets) {
+        super(assets, assets.getAsset("tree"));
+    }
+}
+
+class Bush extends PlantSpecies {
+    public function new(assets: common.Assets) {
+        super(assets, assets.getAsset("bush"));
+    }
+}
+
+class Fungus extends PlantSpecies {
+    public function new(assets: common.Assets) {
+        super(assets, assets.getAsset("fungus"));
+    }
+}
+
+class Grass extends PlantSpecies {
+    public function new(assets: common.Assets) {
+        super(assets, assets.getAsset("grass"));
     }
 }
 
@@ -180,7 +196,7 @@ class AnimalSpecies extends Species {
         var e = this.eye.getBitmap();
         layer.scaleX = 1.5;
         layer.scaleY = 1.5;
-        layer.x = 6;
+        layer.x = 12;
         layer.y = 6;
         return layer;
     }
