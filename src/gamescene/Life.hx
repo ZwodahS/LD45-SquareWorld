@@ -28,6 +28,7 @@ class Life {
     public var isDead: Bool = false;
 
     public var numOffspring: Int = 0;
+    public var targetLocation: common.Point2i = null;
 
     public function new(species: Species) {
         this.species = species;
@@ -95,6 +96,10 @@ class Life {
 
     public function get_type(): String {
         return this.species.genericType;
+    }
+
+    public function shouldDie(): Bool {
+        return this.species.shouldDie(this);
     }
 }
 

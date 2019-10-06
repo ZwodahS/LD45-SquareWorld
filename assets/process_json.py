@@ -13,18 +13,6 @@ with open(sys.argv[1]) as f:
 frame_tags = data["meta"]["frameTags"]
 
 definitions = {
-    "animal_fill": [ "animal_fill" ],
-    "animal_skins": [
-        "animal_skins"+str(i) for i in range(0, 3)
-    ],
-    "animal_eyes": [
-        "animal_eyes"+str(i) for i in range(0, 2)
-    ],
-    "plant_fill": [ "plant_fill" ],
-    "plant_deco": [
-        "plant_deco"+str(i) for i in range(0, 3)
-    ],
-
     "tree": [ "tree" + str(i) for i in range(0, 3) ],
     "fungus": [ "fungus" + str(i) for i in range(0, 3) ],
     "bush": [ "bush" + str(i) for i in range(0, 3) ],
@@ -32,6 +20,10 @@ definitions = {
     "slime": [ "slime" + str(i) for i in range(0, 3) ],
     "food": [ "food" + str(i) for i in range(0, 3) ],
     "nutrient": [ "nutrient" + str(i) for i in range(0, 3) ],
+    "bird": [ "bird" + str(i) for i in range(0, 3) ],
+    "rodent": [ "rodent" + str(i) for i in range(0, 2) ],
+    "insect": [ "insect" + str(i) for i in range(0, 2) ],
+    "isopod": [ "isopod" + str(i) for i in range(0, 2) ],
 }
 frames = data["frames"]
 processed_frames = {}

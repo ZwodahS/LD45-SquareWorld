@@ -3,6 +3,7 @@ package gamescene;
 
 import haxe.ds.Vector;
 import common.Direction;
+import common.Point2i;
 
 class SpCard extends h2d.Layers {
 
@@ -130,12 +131,16 @@ class Species {
         return layer;
     }
 
+    public function shouldDie(life: Life): Bool {
+        return false;
+    }
+
 }
 
 class PlantSpecies extends Species{
 
     public var energyMultiplier(default, null): Float = 5.0;
-    public var energyConsumption(default, null): Int = 25;
+    public var consumptionRate(default, null): Int = 25;
     public var reproductionChance(default, null): Int = 5;
     public var reproductionEnergyRequirement(default, null): Int = 100;
     public var reproductionAgeRequirement(default, null): Int = 10;
@@ -143,7 +148,6 @@ class PlantSpecies extends Species{
     public var ageNutrientsMultiplier(default, null):Float = 7;
     public var nutrientAbsorptionRate(default, null):Int = 10;
     public var extractRange(default, null): Int = 1;
-    public var consumptionRate(default, null): Int = 10;
     public var autoDie(default, null): Bool = true;
     public var maxMass(default, null): Int = -1;
 
@@ -191,7 +195,7 @@ class PlantSpecies extends Species{
             // extract from surrounding
             var cellList = common.GridUtils.getPointsAround(
                     [life.x, life.y], this.extractRange,
-                    [0, 0, world.cells.length+1, world.cells[0].length+1]);
+                    [0, 0, world.cells.length-1, world.cells[0].length-1]);
             Random.shuffle(cellList);
 
             for (cell in cellList) {
@@ -211,7 +215,7 @@ class PlantSpecies extends Species{
 
     override function processGrowth(life: Life, world: World) {
         super.processGrowth(life, world);
-        var consume = hxd.Math.imin(life.energy, this.energyConsumption);
+        var consume = hxd.Math.imin(life.energy, this.consumptionRate);
         life.energy -= consume;
         if (consume > 0) {
             life.mass += massPerTurn;
@@ -233,7 +237,7 @@ class PlantSpecies extends Species{
                 life.energy -= energyUsed;
                 var cellList = common.GridUtils.getPointsAround(
                         [life.x, life.y], this.produceRange,
-                        [0, 0, world.cells.length+1, world.cells[0].length+1],
+                        [0, 0, world.cells.length-1, world.cells[0].length-1],
                         false);
                 var point = Random.shuffle(cellList);
                 for (cell in cellList) {
@@ -327,12 +331,8 @@ class Tree extends PlantSpecies {
         this.description = (
                 'Tree a simple plant that is able to extract nutrients from soil\n'+
                 'It is efficient in converting nutrients to energy\n'+
-                'It does not lose much energy, and many of the energy are stored.\n'
-        );
-        this.detail = (
-                'Energy Cost/Turn: ${this.energyConsumption}\n' +
-                'Energy/Nutrient Absorbed: ${this.energyMultiplier}\n' +
-                'Food: ${this.foodPerProduction}/${this.productionTurn}turn\n'
+                'It does not lose much energy, and many of the energy are stored.\n'+
+                'Tree will not die if it runs out of energy'
         );
     }
 }
@@ -365,17 +365,12 @@ class Bush extends PlantSpecies {
 
         this.description = (
                 'Bush a plant that is able to extract nutrients from soil\n'+
-                'It will grow fast and produce constant amount of food\n'
-        );
-        this.detail = (
-                'Energy Cost/Turn: ${this.energyConsumption}\n' +
-                'Energy/Nutrient Absorbed: ${this.energyMultiplier}\n' +
-                'Food: ${this.foodPerProduction}/${this.productionTurn}turn\n'
+                'It will grow fast and produce constant amount of food\n'+
+                'Unlike tree, bushes will die when it runs out of energy'
         );
     }
 
     override public function getReproductionChance(life: Life, world: World): Int {
-        trace("bush");
         if (life.numOffspring> 2) return 0;
         return this.reproductionChance + (life.energyGainedThisStep == 0 ? 50 : 0);
     }
@@ -404,12 +399,8 @@ class Fungus extends PlantSpecies {
 
         this.description = (
                 'Fungus is a rapid growing organism that will spread very fast\n'+
-                'If not controlled, it will destroy your ecosystem\nby rapidly deplete your nutrients.\n'
-        );
-        this.detail = (
-                'Energy Cost/Turn: ${this.energyConsumption}\n' +
-                'Energy/Nutrient Absorbed: ${this.energyMultiplier}\n' +
-                'Max Mass: ${this.maxMass}\n'
+                'If not controlled, it will destroy your ecosystem\nby rapidly deplete your nutrients.\n'+
+                'Fungus will die once it runs out of energy'
         );
     }
 }
@@ -438,7 +429,8 @@ class Grass extends PlantSpecies {
         this.description = (
                 'Grass is a rapid growing plant.\n'+
                 'It will not die when it runs out of energy.\n' +
-                'A favourite food for herbivore'
+                'A favourite food for the insect\n'+
+                'Grass will not die if it runs out of energy'
         );
     }
 
@@ -455,18 +447,26 @@ class AnimalSpecies extends Species {
 
     public var energyMultiplier(default, null): Float = 10.0;
     public var nutrientAbsorptionRate(default, null):Int = 20;
-    public var energyConsumption(default, null): Int = 50;
+    public var consumptionRate(default, null): Int = 50;
     public var reproductionChance(default, null): Int = 10;
     public var reproductionEnergyRequirement(default, null): Int = 0;
     public var reproductionAgeRequirement(default, null): Int = 100;
     public var maxEnergy(default, null): Int = 5000;
     public var maxMass: Int = 1000;
     public var massPerTurn: Int = 3;
+    public var startingEnergy: Int = 500;
+    public var dieNutrientsRange: Int = 2;
 
     public var _drawable: SpCard;
 
     public function new(assets: common.Assets, tiles: common.Assets.Asset2D) {
         super(assets, tiles);
+    }
+
+    override public function newLife(): Life {
+        var life = super.newLife();
+        life.energy = this.startingEnergy;
+        return life;
     }
 
     override public function get_genericType(): String {
@@ -485,7 +485,7 @@ class AnimalSpecies extends Species {
 
     override public function processMove(life: Life, world: World) {
         var cell = world.cells[life.x][life.y];
-        if (life.energy < this.maxEnergy && cell.nutrients > 0) return;
+        if (!this.shouldMove(life, world)) return;
 
         if (this.shouldChangeDirection(life)) {
             this.changeDirection(life);
@@ -501,9 +501,13 @@ class AnimalSpecies extends Species {
         world.moveLife(life, point);
     }
 
+    function shouldMove(life: Life, world: World): Bool {
+        return true;
+    }
+
     override function processGrowth(life: Life, world: World) {
         super.processGrowth(life, world);
-        var consume = hxd.Math.imin(life.energy, this.energyConsumption);
+        var consume = hxd.Math.imin(life.energy, this.consumptionRate);
         life.energy -= consume;
         if (consume > 0) {
             life.mass += massPerTurn;
@@ -519,21 +523,6 @@ class AnimalSpecies extends Species {
             return d != life.currentDirection && d != common.Direction.Utils.opposite(life.currentDirection);
         });
         life.currentDirection = Random.fromArray(availableDirection);
-    }
-
-    override public function processExtract(life: Life, world: World) {
-        if (life.energy > this.maxEnergy) {
-            return;
-        }
-
-        var cell = world.cells[life.x][life.y];
-        var drained:Int = 0;
-        var have = hxd.Math.imin(cell.nutrients, this.nutrientAbsorptionRate - drained);
-
-        drained += have;
-        cell.nutrients -= have;
-
-        life.energy += Math.floor(this.energyMultiplier * drained);
     }
 
     public function canReproduce(life: Life): Bool {
@@ -572,10 +561,11 @@ class AnimalSpecies extends Species {
     }
 
     override public function processDie(life: Life, world: World) {
-        var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], 2);
+        var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], this.dieNutrientsRange);
         cellList.push(world.cells[life.x][life.y]);
         Random.shuffle(cellList);
-        var newNutrients = life.mass * Constants.NutrientPerMass;
+        var newNutrients = life.mass * Constants.NutrientPerMass + Math.floor(life.energy / Constants.EnergyPerNutrient);
+        trace('new nutrients: ${newNutrients}');
         var spread = Math.floor(newNutrients / 2 / cellList.length);
         // 50% evenly spread
         for (cell in cellList) {
@@ -590,6 +580,14 @@ class AnimalSpecies extends Species {
     public function getReproductionChance(life: Life, world: World): Int {
         return this.reproductionChance;
     }
+
+    override function processConsume(life: Life, world: World) {
+        var consumed = hxd.Math.imin(life.energy, this.consumptionRate);
+        life.energy -= consumed;
+        if (life.energy == 0) {
+            life.die();
+        }
+    }
 }
 
 class Slime extends AnimalSpecies {
@@ -601,16 +599,18 @@ class Slime extends AnimalSpecies {
 
         this.energyMultiplier = 10.0;
         this.nutrientAbsorptionRate = 50;
-        this.energyConsumption = 100;
+        this.consumptionRate = 100;
 
         this.maxEnergy = 10000;
         this.maxMass = -1;
         this.massPerTurn = 9;
+        this.dieNutrientsRange = 4;
 
         this.description = (
                 'Slime is a nutrient absorbing creature.\n' +
                 'Most of what is absorbed is stored in itself.\n' +
-                'When the slime gets bigger, it will split into multiple slime'
+                'When the slime gets bigger, it will split into multiple slime.\n'+
+                'The slime will explode into nutrients if it reaches age 200\nif it did not split by then\n'
         );
     }
 
@@ -630,4 +630,150 @@ class Slime extends AnimalSpecies {
     override public function getReproductionChance(life: Life, world: World): Int {
         return Math.floor(life.mass / 5);
     }
+
+    override public function shouldMove(life: Life, world: World): Bool {
+        var cell = world.cells[life.x][life.y];
+        return !(life.energy < this.maxEnergy && cell.nutrients > 0);
+    }
+
+    override public function processExtract(life: Life, world: World) {
+        if (life.energy > this.maxEnergy) {
+            return;
+        }
+
+        var drained:Int = world.drainNutrients([life.x, life.y], this.nutrientAbsorptionRate);
+        life.energy += Math.floor(this.energyMultiplier * drained);
+    }
+
+    override public function shouldDie(life: Life): Bool {
+        return life.age > 200;
+    }
+
 }
+
+class Rodent extends AnimalSpecies {
+
+    public var foodAbsorptionRate = 10;
+    public function new(assets: common.Assets) {
+        super(assets, assets.getAsset("rodent"));
+
+        this.nameString = "Rodent";
+        this.typeString = "animal";
+
+        this.consumptionRate = 20;
+        this.maxEnergy = 5000;
+        this.maxMass = 100;
+        this.massPerTurn = 1;
+        this.energyMultiplier = 50;
+        this.foodAbsorptionRate = 10;
+
+        this.description = (
+                'Rodent are small creatures that eat the food that tree and\nbushes produces.\n'+
+                'It will try to search for the nearest food and move towards it\n'+
+                'If it can\' find a food source, it will move around random\nhoping to get close to food'+
+                'Rodent also produces nutrients as it move around'
+        );
+    }
+
+    override public function shouldMove(life: Life, world: World): Bool {
+        var cell = world.cells[life.x][life.y];
+        return (cell.food == 0);
+    }
+
+    override public function processExtract(life: Life, world: World) {
+        if (life.energy > this.maxEnergy) {
+            return;
+        }
+
+        var drained:Int = world.drainFood([life.x, life.y], this.foodAbsorptionRate);
+        life.energy += Math.floor(this.energyMultiplier * drained);
+    }
+
+    override function processProduce(life: Life, world: World) {
+        if (life.energy == 0) return;
+
+        world.addNutrients([life.x, life.y], 2);
+    }
+
+    override public function processMove(life: Life, world: World) {
+        if (!this.shouldMove(life, world)) {
+            life.targetLocation = null;
+            return;
+        }
+
+        if (life.targetLocation != null && (
+                    life.x == life.targetLocation.x && life.y == life.targetLocation.y)) {
+            // reach but no food.
+            life.targetLocation = null;
+        }
+
+        if (life.targetLocation == null) {
+            // try to see if there are any food in the surrounding area
+            var points = common.GridUtils.getPointsAround(
+                    [life.x, life.y], 4,
+                    [0, 0, world.cells.length-1, world.cells[0].length-1]
+            );
+            points.sort(function(p1: Point2i, p2: Point2i): Int {
+                return p1.distance([life.x, life.y]) - p2.distance([life.x, life.y]);
+            });
+
+            for (p in points) {
+                if (world.cells[p.x][p.y].food > 0) {
+                    life.targetLocation = p;
+                    break;
+                }
+            }
+            // if still null, means we need to go randomly and hope for the best.
+            if (life.targetLocation == null) {
+                life.targetLocation = Random.fromArray(points);
+            }
+        }
+        this.changeDirection(life);
+
+        var point = common.Direction.Utils.directionToCoord(life.currentDirection);
+        point = [life.x + point.x, life.y + point.y];
+        if (!world.inBound(point)) {
+            this.changeDirection(life);
+            point = common.Direction.Utils.directionToCoord(life.currentDirection);
+            point = [life.x + point.x, life.y + point.y];
+        }
+        world.moveLife(life, point);
+    }
+
+    override function changeDirection(life: Life) {
+        var availableDirection = [Direction.Left, Direction.Up, Direction.Right, Direction.Down];
+        if (life.targetLocation != null) {
+            // set direction based on target Location
+            var diff = life.targetLocation - [life.x, life.y];
+            if (Math.abs(diff.x) > Math.abs(diff.y)) {
+                life.currentDirection = diff.x > 0 ? Direction.Right : Direction.Left;
+            } else {
+                life.currentDirection = diff.y > 0 ? Direction.Down : Direction.Up;
+            }
+            return;
+        }
+        availableDirection = availableDirection.filter(function(d: Direction) {
+            return d != life.currentDirection && d != common.Direction.Utils.opposite(life.currentDirection);
+        });
+        life.currentDirection = Random.fromArray(availableDirection);
+    }
+}
+
+class Insect extends AnimalSpecies {
+    public function new(assets: common.Assets) {
+        super(assets, assets.getAsset("insect"));
+    }
+}
+
+class Isopod extends AnimalSpecies {
+    public function new(assets: common.Assets) {
+        super(assets, assets.getAsset("isopod"));
+    }
+}
+
+class Bird extends AnimalSpecies {
+    public function new(assets: common.Assets) {
+        super(assets, assets.getAsset("bird"));
+    }
+}
+

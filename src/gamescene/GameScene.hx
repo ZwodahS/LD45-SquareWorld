@@ -43,10 +43,10 @@ class InfoLayer extends h2d.Layers {
     var titleColor: h3d.Vector = h3d.Vector.fromColor(0xFFFFFFFF);
     var grey: h3d.Vector = h3d.Vector.fromColor(0xFFAAAAAA);
     var red: h3d.Vector = h3d.Vector.fromColor(0xFFAC3232);
-    var green: h3d.Vector = h3d.Vector.fromColor(0xFF6ABE30);
-    var blue: h3d.Vector = h3d.Vector.fromColor(0xFF639BFF);
+    var green: h3d.Vector = h3d.Vector.fromColor(0xFF99e550);
+    var blue: h3d.Vector = h3d.Vector.fromColor(0xFF5fecd4);
 
-    public function new() {
+    public function new(assets: common.Assets) {
         super();
 
         var fontH1 = hxd.res.DefaultFont.get();
@@ -55,7 +55,7 @@ class InfoLayer extends h2d.Layers {
         fontH2.resizeTo(14);
         var fontP = fontH2.clone();
         fontP.resizeTo(12);
-        var background = new h2d.Bitmap(h2d.Tile.fromColor(0x663931, 500, 500));
+        var background = assets.getAsset("info").getBitmap();
 
         var textOffset: Point2f = [10, 10];
         this.add(background, 0);
@@ -246,7 +246,7 @@ class GameScene implements common.Scene {
         this.init();
         this.updater = new Updater();
         this.speciesList = new Array<Species>();
-        this.infoLayer = new InfoLayer();
+        this.infoLayer = new InfoLayer(assets);
         this.scene.add(infoLayer, 10);
         this.hud = new Hud(assets, this.infoLayer);
         this.scene.add(this.hud.drawable, 0);
@@ -256,6 +256,10 @@ class GameScene implements common.Scene {
         this.speciesList.push(new Species.Bush(assets));
         this.speciesList.push(new Species.Tree(assets));
         this.speciesList.push(new Species.Slime(assets));
+        this.speciesList.push(new Species.Rodent(assets));
+        this.speciesList.push(new Species.Insect(assets));
+        this.speciesList.push(new Species.Isopod(assets));
+        this.speciesList.push(new Species.Bird(assets));
 
         for (s in this.speciesList) {
             this.hud.addSpecies(s);
@@ -293,7 +297,7 @@ class GameScene implements common.Scene {
             life.processGrowth(this.world);
         }
         for (life in this.world.lifeList) {
-            if (!life.isAlive) {
+            if (!life.isAlive || life.shouldDie()) {
                 life.processDie(this.world);
                 this.world.removeLife(life);
             }

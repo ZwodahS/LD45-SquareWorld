@@ -1,70 +1,4 @@
 {
-    "animal_eyes": {
-        "frames": [
-            {
-                "src": "images",
-                "key": "animal_eyes0",
-                "color": [255, 255, 255, 255]
-            },
-            {
-                "src": "images",
-                "key": "animal_eyes1",
-                "color": [255, 255, 255, 255]
-            }
-        ]
-    },
-    "animal_fill": {
-        "frame": {
-            "src": "images",
-            "key": "animal_fill",
-            "color": [255, 255, 255, 255]
-        }
-    },
-    "animal_skins": {
-        "frames":[
-            {
-                "src": "images",
-                "key": "animal_skins0",
-                "color": [255, 255, 255, 255]
-            },
-            {
-                "src": "images",
-                "key": "animal_skins1",
-                "color": [255, 255, 255, 255]
-            },
-            {
-                "src": "images",
-                "key": "animal_skins2",
-                "color": [255, 255, 255, 255]
-            }
-        ]
-    },
-    "plant_fill": {
-        "frame": {
-            "src": "images",
-            "key": "plant_fill",
-            "color": [255, 255, 255, 255]
-        }
-    },
-    "plant_deco": {
-        "frames":[
-            {
-                "src": "images",
-                "key": "plant_deco0",
-                "color": [255, 255, 255, 255]
-            },
-            {
-                "src": "images",
-                "key": "plant_deco1",
-                "color": [255, 255, 255, 255]
-            },
-            {
-                "src": "images",
-                "key": "plant_deco2",
-                "color": [255, 255, 255, 255]
-            }
-        ]
-    },
     "food": {
         "frames": [
             {
@@ -108,6 +42,13 @@
         "frame": {
             "src": "images",
             "key": "spcard",
+            "color": [255, 255, 255, 255]
+        }
+    },
+    "info": {
+        "frame": {
+            "src": "images",
+            "key": "info",
             "color": [255, 255, 255, 255]
         }
     },
@@ -188,6 +129,58 @@
             {
                 "src": "images",
                 "key": "slime2"
+            }
+        ]
+    },
+    "bird": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "bird0"
+            },
+            {
+                "src": "images",
+                "key": "bird1"
+            },
+            {
+                "src": "images",
+                "key": "bird2"
+            }
+        ]
+    },
+    "rodent": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "rodent0"
+            },
+            {
+                "src": "images",
+                "key": "rodent1"
+            }
+        ]
+    },
+    "insect": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "insect0"
+            },
+            {
+                "src": "images",
+                "key": "insect1"
+            }
+        ]
+    },
+    "isopod": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "isopod0"
+            },
+            {
+                "src": "images",
+                "key": "isopod1"
             }
         ]
     }

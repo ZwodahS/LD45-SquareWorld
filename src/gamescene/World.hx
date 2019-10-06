@@ -96,12 +96,28 @@ class World {
         return pos.x >= 0 && pos.x < this.cells.length && pos.y >= 0 && pos.y < this.cells[0].length;
     }
 
+    public function addNutrients(pos: Point2i, amount:Int): Bool {
+        var cell = this.inBound(pos) ? this.cells[pos.x][pos.y]: null;
+        if (cell == null) return false;
+
+        cell.nutrients += amount;
+        return true;
+    }
     public function drainNutrients(pos: Point2i, amount: Int): Int {
         var cell = this.inBound(pos) ? this.cells[pos.x][pos.y] : null;
         if (cell == null) return 0;
 
         var drain = hxd.Math.imin(cell.nutrients, amount);
         cell.nutrients -= drain;
+        return drain;
+    }
+
+    public function drainFood(pos: Point2i, amount: Int): Int {
+        var cell = this.inBound(pos) ? this.cells[pos.x][pos.y] : null;
+        if (cell == null) return 0;
+
+        var drain = hxd.Math.imin(cell.food, amount);
+        cell.food -= drain;
         return drain;
     }
 

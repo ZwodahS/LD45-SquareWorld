@@ -268,24 +268,6 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
     "sourceSize": { "w": 24, "h": 24 },
     "duration": 100
-   },
-   {
-    "filename": "images 30.aseprite",
-    "frame": { "x": 0, "y": 72, "w": 24, "h": 24 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
-    "sourceSize": { "w": 24, "h": 24 },
-    "duration": 100
-   },
-   {
-    "filename": "images 31.aseprite",
-    "frame": { "x": 24, "y": 72, "w": 24, "h": 24 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
-    "sourceSize": { "w": 24, "h": 24 },
-    "duration": 100
    }
  ],
  "meta": {
@@ -296,18 +278,17 @@
   "size": { "w": 256, "h": 128 },
   "scale": "1",
   "frameTags": [
-   { "name": "animal_fill", "from": 0, "to": 0, "direction": "forward" },
-   { "name": "animal_skins", "from": 1, "to": 3, "direction": "forward" },
-   { "name": "animal_eyes", "from": 4, "to": 5, "direction": "forward" },
-   { "name": "plant_fill", "from": 6, "to": 6, "direction": "forward" },
-   { "name": "plant_deco", "from": 7, "to": 9, "direction": "forward" },
-   { "name": "bush", "from": 10, "to": 12, "direction": "forward" },
-   { "name": "tree", "from": 13, "to": 15, "direction": "forward" },
-   { "name": "fungus", "from": 16, "to": 18, "direction": "forward" },
-   { "name": "grass", "from": 19, "to": 21, "direction": "forward" },
-   { "name": "slime", "from": 22, "to": 24, "direction": "forward" },
-   { "name": "food", "from": 25, "to": 27, "direction": "forward" },
-   { "name": "nutrient", "from": 28, "to": 30, "direction": "forward" }
+   { "name": "bush", "from": 0, "to": 2, "direction": "forward" },
+   { "name": "tree", "from": 3, "to": 5, "direction": "forward" },
+   { "name": "fungus", "from": 6, "to": 8, "direction": "forward" },
+   { "name": "grass", "from": 9, "to": 11, "direction": "forward" },
+   { "name": "slime", "from": 12, "to": 14, "direction": "forward" },
+   { "name": "food", "from": 15, "to": 17, "direction": "forward" },
+   { "name": "nutrient", "from": 18, "to": 20, "direction": "forward" },
+   { "name": "rodent", "from": 21, "to": 22, "direction": "forward" },
+   { "name": "insect", "from": 23, "to": 24, "direction": "forward" },
+   { "name": "bird", "from": 25, "to": 27, "direction": "forward" },
+   { "name": "isopod", "from": 28, "to": 29, "direction": "forward" }
   ],
   "layers": [
    { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
