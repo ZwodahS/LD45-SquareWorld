@@ -65,16 +65,23 @@ class SpCard extends h2d.Layers {
 class Species {
 
     var assets: common.Assets;
+    var tiles: common.Assets.Asset2D;
     public var genericType(get, null): String;
+    public var drawable: SpCard;
 
-    public var drawable(get, null): SpCard;
+    var growRequirement: Array<Int> = [50, 100];
 
-    public function new(assets: common.Assets) {
+    public function new(assets: common.Assets, tiles: common.Assets.Asset2D) {
         this.assets = assets;
+        this.tiles = tiles;
+        this.drawable = this.makeCard();
     }
 
     public function newLife(): Life {
-        return null;
+        var life = new Life(this);
+        var bitmap = this.tiles.getBitmap(0);
+        life.drawable.add(bitmap, 0);
+        return life;
     }
 
     public function get_drawable(): SpCard {
@@ -87,33 +94,17 @@ class Species {
     public function processReproduce(life: Life, world: World) {}
     public function processAge(life: Life, world: World) {
         life.age += 1;
+        if (life.stage < this.growRequirement.length && life.age == this.growRequirement[life.stage] ) {
+            life.stage += 1;
+            life.drawable.removeChildren();
+            life.drawable.add(this.tiles.getBitmap(life.stage), 0);
+        }
     }
     public function processDie(life: Life, world: World) {}
     public function processDecay(life: Life, world: World) {}
 
     public function get_genericType(): String {
         return "undefined";
-    }
-}
-
-class PlantSpecies extends Species{
-
-    var tiles: common.Assets.Asset2D;
-
-    public var energyMultiplier(default, null): Float = 5.0;
-    public var energyConsumption(default, null): Int = 25;
-    public var reproductionChance(default, null): Int = 5;
-    public var reproductionEnergyRequirement(default, null): Int = 100;
-    public var reproductionAgeRequirement(default, null): Int = 10;
-    public var ageNutrientsMultiplier(default, null):Float = 7;
-    public var nutrientAbsorptionRate(default, null):Int = 10;
-
-    public var _drawable: SpCard;
-
-    public function new(assets: common.Assets, tiles: common.Assets.Asset2D) {
-        super(assets);
-        this.tiles = tiles;
-        this._drawable = this.makeCard();
     }
 
     function makeCard(): SpCard {
@@ -133,24 +124,30 @@ class PlantSpecies extends Species{
         return layer;
     }
 
-    override public function newLife(): Life {
-        var life = new Life(this);
-        var bitmap = this.tiles.getBitmap(2);
-        life.drawable.add(bitmap, 0);
-        return life;
+}
+
+class PlantSpecies extends Species{
+
+    public var energyMultiplier(default, null): Float = 5.0;
+    public var energyConsumption(default, null): Int = 25;
+    public var reproductionChance(default, null): Int = 5;
+    public var reproductionEnergyRequirement(default, null): Int = 100;
+    public var reproductionAgeRequirement(default, null): Int = 10;
+    public var ageNutrientsMultiplier(default, null):Float = 7;
+    public var nutrientAbsorptionRate(default, null):Int = 10;
+
+
+    public function new(assets: common.Assets, tiles: common.Assets.Asset2D) {
+        super(assets, tiles);
     }
 
-    override public function get_drawable(): SpCard {
-        return _drawable;
+    override function get_genericType(): String {
+        return "plant";
     }
 
     function canReproduce(life: Life, world: World) {
         return (life.energy > this.reproductionEnergyRequirement &&
                 life.age > this.reproductionAgeRequirement);
-    }
-
-    override function get_genericType(): String {
-        return "plant";
     }
 
     override function processExtract(life: Life, world: World) {
@@ -279,49 +276,12 @@ class AnimalSpecies extends Species {
 
     public var _drawable: SpCard;
 
-    public function new(assets: common.Assets) {
-        super(assets);
-
-        this.fill = assets.getAsset("animal_fill").tiles[0].copy();
-        this.fill.color = new h3d.Vector(0.1, 0.1, 0.8);
-        this.skin = assets.getAsset("animal_skins").tiles[common.MathUtils.random(0, 2)].copy();
-        this.skin.color = new h3d.Vector(1, 1, 1, 0.4);
-        this.eye = assets.getAsset("animal_eyes").tiles[common.MathUtils.random(0, 1)].copy();
-        this.eye.color = new h3d.Vector(0, 0, 0, 0.4);
-
-        this._drawable = this.makeCard();
+    public function new(assets: common.Assets, tiles: common.Assets.Asset2D) {
+        super(assets, tiles);
     }
 
-    function makeCard(): SpCard {
-        var layer = new SpCard(this.assets);
-        layer.add(this.makeLifeImage(), 1);
-        return layer;
-    }
-
-    function makeLifeImage(): h2d.Layers {
-        var layer = new h2d.Layers();
-        var f = this.fill.getBitmap();
-        layer.add(f, 1);
-        var s = this.skin.getBitmap();
-        layer.add(s, 2);
-        var e = this.eye.getBitmap();
-        layer.scaleX = 1.5;
-        layer.scaleY = 1.5;
-        layer.x = 12;
-        layer.y = 6;
-        return layer;
-    }
-
-    override public function newLife(): Life {
-        var life = new Life(this);
-        life.drawable.add(this.fill.getBitmap(), 0);
-        life.drawable.add(this.skin.getBitmap(), 1);
-        life.drawable.add(this.eye.getBitmap(), 2);
-        return life;
-    }
-
-    override public function get_drawable(): SpCard {
-        return _drawable;
+    override public function get_genericType(): String {
+        return "animal";
     }
 
     function shouldChangeDirection(life: Life): Bool {
@@ -418,8 +378,10 @@ class AnimalSpecies extends Species {
         var cell = world.cells[life.x][life.y];
         cell.nutrients += newNutrients;
     }
+}
 
-    override public function get_genericType(): String {
-        return "animal";
+class Slime extends AnimalSpecies {
+    public function new(assets: common.Assets) {
+        super(assets, assets.getAsset("slime"));
     }
 }

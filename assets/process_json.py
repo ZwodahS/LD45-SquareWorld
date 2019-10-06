@@ -29,6 +29,7 @@ definitions = {
     "fungus": [ "fungus" + str(i) for i in range(0, 3) ],
     "bush": [ "bush" + str(i) for i in range(0, 3) ],
     "grass": [ "grass" + str(i) for i in range(0, 3) ],
+    "slime": [ "slime" + str(i) for i in range(0, 3) ],
 }
 frames = data["frames"]
 processed_frames = {}

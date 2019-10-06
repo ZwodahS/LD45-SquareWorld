@@ -196,6 +196,33 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
     "sourceSize": { "w": 24, "h": 24 },
     "duration": 100
+   },
+   {
+    "filename": "images 22.aseprite",
+    "frame": { "x": 48, "y": 96, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 23.aseprite",
+    "frame": { "x": 72, "y": 96, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 24.aseprite",
+    "frame": { "x": 96, "y": 96, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
    }
  ],
  "meta": {
@@ -214,7 +241,8 @@
    { "name": "bush", "from": 10, "to": 12, "direction": "forward" },
    { "name": "tree", "from": 13, "to": 15, "direction": "forward" },
    { "name": "fungus", "from": 16, "to": 18, "direction": "forward" },
-   { "name": "grass", "from": 19, "to": 21, "direction": "forward" }
+   { "name": "grass", "from": 19, "to": 21, "direction": "forward" },
+   { "name": "slime", "from": 22, "to": 24, "direction": "forward" }
   ],
   "layers": [
    { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }

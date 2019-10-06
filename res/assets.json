@@ -142,5 +142,21 @@
                 "key": "grass2"
             }
         ]
+    },
+    "slime": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "slime0"
+            },
+            {
+                "src": "images",
+                "key": "slime1"
+            },
+            {
+                "src": "images",
+                "key": "slime2"
+            }
+        ]
     }
 }

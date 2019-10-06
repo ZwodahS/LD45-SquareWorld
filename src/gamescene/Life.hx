@@ -8,54 +8,42 @@ class Life {
 
     var species: Species;
 
-    public var age(default, set): Int = 0;
+    public var age: Int = 0;
     public var drawable: h2d.Layers;
 
     public var x(default, set): Int = 0;
     public var y(default, set): Int = 0;
 
     public var energy: Int = 0;
-    public var size: Float = 0.5;
     public var isAlive(get, null): Bool;
 
     public var type(get, null): String;
 
     public var energyGainedThisStep: Int = 0;
     public var currentDirection: Direction = Direction.None;
+    public var stage: Int = 0;
 
     public function new(species: Species) {
         this.species = species;
         this.drawable = new h2d.Layers();
-        this.updateDrawable();
+        this.drawable.x = (this.x * Constants.GridSize);
+        this.drawable.y = (this.y * Constants.GridSize);
     }
 
     public function set_x(x: Int): Int {
         this.x = x;
-        this.drawable.x = (this.x * Constants.GridSize) + (
-                (Constants.GridSize - (this.size * Constants.GridSize))/2);
+        this.drawable.x = (this.x * Constants.GridSize);
         return this.x;
     }
 
     public function set_y(y: Int): Int {
         this.y = y;
-        this.drawable.y = (this.y * Constants.GridSize) + (
-                (Constants.GridSize - (this.size * Constants.GridSize))/2);
+        this.drawable.y = (this.y * Constants.GridSize);
         return this.y;
-    }
-
-    public function updateDrawable() {
-        this.size = Math.max(0.5, Math.min(1.0, 0.5+age/100));
-        this.drawable.scaleX = this.size;
-        this.drawable.scaleY = this.size;
-        this.drawable.x = (this.x * Constants.GridSize) + (
-                (Constants.GridSize - (this.size * Constants.GridSize))/2);
-        this.drawable.y = (this.y * Constants.GridSize) + (
-                (Constants.GridSize - (this.size * Constants.GridSize))/2);
     }
 
     public function set_age(age: Int): Int {
         this.age = age;
-        this.updateDrawable();
         return this.age;
     }
 
