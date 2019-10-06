@@ -99,14 +99,7 @@ class Hud {
             var card = this.findSelectedInd(new h2d.col.Point(event.relX, event.relY));
             if (card == -1) {
             } else {
-                if (currentSelect != -1) this.speciesDrawable[currentSelect].unselect();
-
-                if (card == this.currentSelect) {
-                    currentSelect = -1;
-                } else {
-                    currentSelect = card;
-                    this.speciesDrawable[currentSelect].select();
-                }
+                this.selectSpecies(card);
             }
         }
     }
@@ -122,6 +115,22 @@ class Hud {
             ind++;
         }
         return newHover;
+    }
+
+    public function selectSpecies(i: Int) {
+        if (i >= 0 && i < this.speciesList.length) {
+            this._selectSpecies(i);
+        }
+    }
+
+    function _selectSpecies(i: Int) {
+        if (currentSelect != -1) this.speciesDrawable[currentSelect].unselect();
+        if (i == this.currentSelect) {
+            currentSelect = -1;
+        } else {
+            currentSelect = i;
+            this.speciesDrawable[currentSelect].select();
+        }
     }
 }
 
@@ -350,6 +359,22 @@ class GameScene implements common.Scene {
                 this.moveCamera[3] = true;
             case hxd.Key.SPACE:
                 this.isPaused = !this.isPaused;
+            case hxd.Key.ESCAPE:
+                this.hud.selectSpecies(-1);
+            case hxd.Key.NUMBER_1:
+                this.hud.selectSpecies(0);
+            case hxd.Key.NUMBER_2:
+                this.hud.selectSpecies(1);
+            case hxd.Key.NUMBER_3:
+                this.hud.selectSpecies(2);
+            case hxd.Key.NUMBER_4:
+                this.hud.selectSpecies(3);
+            case hxd.Key.NUMBER_5:
+                this.hud.selectSpecies(4);
+            case hxd.Key.NUMBER_6:
+                this.hud.selectSpecies(5);
+            case hxd.Key.NUMBER_7:
+                this.hud.selectSpecies(6);
             default:
         }
     }
