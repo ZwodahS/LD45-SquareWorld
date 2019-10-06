@@ -1,6 +1,9 @@
 
 package gamescene;
 
+import haxe.ds.Vector;
+import common.Direction;
+
 class SpCard extends h2d.Layers {
 
     var spcard: h2d.Bitmap;
@@ -62,6 +65,7 @@ class SpCard extends h2d.Layers {
 class Species {
 
     var assets: common.Assets;
+    public var genericType(get, null): String;
 
     public var drawable(get, null): SpCard;
 
@@ -75,6 +79,20 @@ class Species {
 
     public function get_drawable(): SpCard {
         return null;
+    }
+
+    public function processMove(life: Life, world: World) {}
+    public function processExtract(life: Life, world: World) {}
+    public function processProduce(life: Life, world: World) {}
+    public function processReproduce(life: Life, world: World) {}
+    public function processAge(life: Life, world: World) {
+        life.age += 1;
+    }
+    public function processDie(life: Life, world: World) {}
+    public function processDecay(life: Life, world: World) {}
+
+    public function get_genericType(): String {
+        return "undefined";
     }
 }
 
@@ -116,7 +134,7 @@ class PlantSpecies extends Species{
     }
 
     override public function newLife(): Life {
-        var life = new Life.PlantLife(this);
+        var life = new Life(this);
         var bitmap = this.tiles.getBitmap(2);
         life.drawable.add(bitmap, 0);
         return life;
@@ -124,6 +142,99 @@ class PlantSpecies extends Species{
 
     override public function get_drawable(): SpCard {
         return _drawable;
+    }
+
+    function canReproduce(life: Life, world: World) {
+        return (life.energy > this.reproductionEnergyRequirement &&
+                life.age > this.reproductionAgeRequirement);
+    }
+
+    override function get_genericType(): String {
+        return "plant";
+    }
+
+    override function processExtract(life: Life, world: World) {
+        life.energyGainedThisStep = 0;
+        // Try extract current cell first
+        var cell = world.cells[life.x][life.y];
+        var drained:Int = 0;
+        var have = hxd.Math.imin(cell.nutrients, this.nutrientAbsorptionRate - drained);
+        drained += have;
+        cell.nutrients -= have;
+
+        if (drained != this.nutrientAbsorptionRate) {
+            // extract from surrounding
+            var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], 2);
+            Random.shuffle(cellList);
+
+            for (cell in cellList) {
+                if (cell == null) {
+                    continue;
+                }
+                if (cell.nutrients > 0) {
+                    have = hxd.Math.imin(cell.nutrients, this.nutrientAbsorptionRate - drained);
+                    drained += have;
+                    cell.nutrients -= have;
+                }
+                if (drained == this.nutrientAbsorptionRate) {
+                    break;
+                }
+            }
+        }
+        drained = Math.floor(this.energyMultiplier * drained);
+        life.energy += drained;
+        life.energyGainedThisStep = drained;
+    }
+
+    override function processAge(life: Life, world: World) {
+        super.processAge(life, world);
+        life.energy -= hxd.Math.imin(life.energy, this.energyConsumption);
+    }
+
+    override public function processReproduce(life: Life, world: World) {
+        if (!this.canReproduce(life, world)) {
+            return;
+        }
+
+        var chance = this.reproductionChance;
+        if (life.energyGainedThisStep == 0) {
+            chance += 20;
+        }
+        if (Random.int(0, 1000) > chance) {
+            return;
+        }
+
+        var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], 2);
+        Random.shuffle(cellList);
+
+        for (cell in cellList) {
+            if (cell.plant != null) {
+                continue;
+            }
+
+            var life = this.newLife();
+            life.x = cell.x;
+            life.y = cell.y;
+            world.addLife(life);
+            break;
+        }
+
+    }
+
+    override public function processDie(life: Life, world: World) {
+        var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], 2);
+        cellList.push(world.cells[life.x][life.y]);
+        Random.shuffle(cellList);
+        var newNutrients = life.age * this.ageNutrientsMultiplier;
+        var spread = Math.floor(newNutrients / 2 / cellList.length);
+        // 50% evenly spread
+        for (cell in cellList) {
+            cell.nutrients += spread;
+        }
+        spread = Math.floor(newNutrients / 2 / 10);
+        for (i in 0...10) {
+            Random.fromArray(cellList).nutrients += spread;
+        }
     }
 }
 
@@ -202,7 +313,7 @@ class AnimalSpecies extends Species {
     }
 
     override public function newLife(): Life {
-        var life = new Life.AnimalLife(this);
+        var life = new Life(this);
         life.drawable.add(this.fill.getBitmap(), 0);
         life.drawable.add(this.skin.getBitmap(), 1);
         life.drawable.add(this.eye.getBitmap(), 2);
@@ -211,5 +322,104 @@ class AnimalSpecies extends Species {
 
     override public function get_drawable(): SpCard {
         return _drawable;
+    }
+
+    function shouldChangeDirection(life: Life): Bool {
+        if (life.currentDirection == Direction.None) {
+            return true;
+        }
+        if (Random.int(0, 1000) < 250) {
+            return true;
+        }
+        return false;
+    }
+
+    override public function processMove(life: Life, world: World) {
+        var cell = world.cells[life.x][life.y];
+        if (life.energy < this.maxEnergy && cell.nutrients > 0) return;
+
+        if (this.shouldChangeDirection(life)) {
+            this.changeDirection(life);
+        }
+
+        var point = common.Direction.Utils.directionToCoord(life.currentDirection);
+        point = [life.x + point.x, life.y + point.y];
+        if (!world.inBound(point)) {
+            this.changeDirection(life);
+            point = common.Direction.Utils.directionToCoord(life.currentDirection);
+            point = [life.x + point.x, life.y + point.y];
+        }
+        world.moveLife(life, point);
+    }
+
+    function changeDirection(life: Life) {
+        var availableDirection = [Direction.Left, Direction.Up, Direction.Right, Direction.Down];
+        availableDirection = availableDirection.filter(function(d: Direction) {
+            return d != life.currentDirection && d != common.Direction.Utils.opposite(life.currentDirection);
+        });
+        life.currentDirection = Random.fromArray(availableDirection);
+    }
+
+    override public function processExtract(life: Life, world: World) {
+        trace(life);
+        if (life.energy > this.maxEnergy) {
+            return;
+        }
+
+        var cell = world.cells[life.x][life.y];
+        var drained:Int = 0;
+        var have = hxd.Math.imin(cell.nutrients, this.nutrientAbsorptionRate - drained);
+
+        drained += have;
+        cell.nutrients -= have;
+
+        life.energy += Math.floor(this.energyMultiplier * drained);
+    }
+
+    public function canReproduce(life: Life): Bool {
+        return (life.energy > this.reproductionEnergyRequirement &&
+                life.age > this.reproductionAgeRequirement);
+    }
+
+    override public function processReproduce(life: Life, world: World) {
+        if (!this.canReproduce(life)) {
+            return;
+        }
+
+        var chance = this.reproductionChance + (life.energy/200);
+        if (Random.int(0, 1000) > chance) {
+            return;
+        }
+
+        var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], 2);
+        Random.shuffle(cellList);
+
+        for (cell in cellList) {
+            if (cell.plant != null) {
+                continue;
+            }
+
+            var life = this.newLife();
+            life.x = cell.x;
+            life.y = cell.y;
+            world.addLife(life);
+            break;
+        }
+
+    }
+
+    override public function processAge(life: Life, world: World) {
+        super.processAge(life, world);
+        life.energy -= hxd.Math.imin(life.energy, this.energyConsumption);
+    }
+
+    override public function processDie(life: Life, world: World) {
+        var newNutrients = Math.floor(life.age * this.ageNutrientsMultiplier);
+        var cell = world.cells[life.x][life.y];
+        cell.nutrients += newNutrients;
+    }
+
+    override public function get_genericType(): String {
+        return "animal";
     }
 }

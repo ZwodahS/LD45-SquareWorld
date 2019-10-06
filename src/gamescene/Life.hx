@@ -6,6 +6,8 @@ import common.Direction;
 
 class Life {
 
+    var species: Species;
+
     public var age(default, set): Int = 0;
     public var drawable: h2d.Layers;
 
@@ -18,7 +20,11 @@ class Life {
 
     public var type(get, null): String;
 
-    public function new() {
+    public var energyGainedThisStep: Int = 0;
+    public var currentDirection: Direction = Direction.None;
+
+    public function new(species: Species) {
+        this.species = species;
         this.drawable = new h2d.Layers();
         this.updateDrawable();
     }
@@ -53,234 +59,34 @@ class Life {
         return this.age;
     }
 
-    public function processMove(world: World) {}
-    public function processExtract(world: World) {}
-    public function processProduce(world: World) {}
-    public function processReproduce(world: World) {}
-    public function processAge(world: World) {
-        this.age += 1;
+    public function processMove(world: World) {
+        this.species.processMove(this, world);
     }
-    public function processDie(world: World) {}
+    public function processExtract(world: World) {
+        this.species.processExtract(this, world);
+    }
+    public function processProduce(world: World) {
+        this.species.processProduce(this, world);
+    }
+    public function processReproduce(world: World) {
+        this.species.processReproduce(this, world);
+    }
+    public function processAge(world: World) {
+        this.species.processAge(this, world);
+    }
+    public function processDie(world: World) {
+        this.species.processDie(this, world);
+    }
+    public function processDecay(world: World) {
+        this.species.processDecay(this, world);
+    }
 
     public function get_isAlive(): Bool {
         return this.energy > 0;
     }
 
     public function get_type(): String {
-        return "life";
+        return this.species.genericType;
     }
 }
 
-class PlantLife extends Life {
-
-    var species: Species.PlantSpecies;
-
-    public var canReproduce(get, null): Bool;
-
-    override public function get_type(): String { return "plant"; }
-
-    var drainedThisTurn: Int = 0;
-
-    public function new(sp: Species.PlantSpecies) {
-        super();
-        this.species = sp;
-    }
-
-    override public function processExtract(world: World) {
-        this.drainedThisTurn = 0;
-        // Try extract current cell first
-        var cell = world.cells[this.x][this.y];
-        var drained:Int = 0;
-        var have = hxd.Math.imin(cell.nutrients, this.species.nutrientAbsorptionRate - drained);
-        drained += have;
-        cell.nutrients -= have;
-
-        if (drained != this.species.nutrientAbsorptionRate) {
-            // extract from surrounding
-            var cellList = common.GridUtils.getAround(world.cells, [this.x, this.y], 2);
-            Random.shuffle(cellList);
-
-            for (cell in cellList) {
-                if (cell == null) {
-                    continue;
-                }
-                if (cell.nutrients > 0) {
-                    have = hxd.Math.imin(cell.nutrients, this.species.nutrientAbsorptionRate - drained);
-                    drained += have;
-                    cell.nutrients -= have;
-                }
-                if (drained == this.species.nutrientAbsorptionRate) {
-                    break;
-                }
-            }
-        }
-        drained = Math.floor(this.species.energyMultiplier * drained);
-        this.energy += drained;
-        this.drainedThisTurn = drained;
-    }
-
-    public function get_canReproduce(): Bool {
-        return (this.energy > this.species.reproductionEnergyRequirement &&
-                this.age > this.species.reproductionAgeRequirement);
-    }
-
-    override public function processAge(world: World) {
-        super.processAge(world);
-        this.energy -= hxd.Math.imin(this.energy, this.species.energyConsumption);
-    }
-
-    override public function processReproduce(world: World) {
-        if (!this.canReproduce) {
-            return;
-        }
-
-        var chance = this.species.reproductionChance;
-        if (this.drainedThisTurn == 0) {
-            chance += 20;
-        }
-        if (Random.int(0, 1000) > chance) {
-            return;
-        }
-
-        var cellList = common.GridUtils.getAround(world.cells, [this.x, this.y], 2);
-        Random.shuffle(cellList);
-
-        for (cell in cellList) {
-            if (cell.plant != null) {
-                continue;
-            }
-
-            var life = this.species.newLife();
-            life.x = cell.x;
-            life.y = cell.y;
-            world.addLife(life);
-            break;
-        }
-
-    }
-
-    override public function processDie(world: World) {
-        var cellList = common.GridUtils.getAround(world.cells, [this.x, this.y], 2);
-        cellList.push(world.cells[this.x][this.y]);
-        Random.shuffle(cellList);
-        var newNutrients = this.age * this.species.ageNutrientsMultiplier;
-        var spread = Math.floor(newNutrients / 2 / cellList.length);
-        // 50% evenly spread
-        for (cell in cellList) {
-            cell.nutrients += spread;
-        }
-        spread = Math.floor(newNutrients / 2 / 10);
-        for (i in 0...10) {
-            Random.fromArray(cellList).nutrients += spread;
-        }
-    }
-}
-
-class AnimalLife extends Life {
-
-    var species: Species.AnimalSpecies;
-
-    var currentDirection: Direction = Direction.None;
-
-    public var canReproduce(get, null): Bool;
-    override public function get_type(): String { return "animal"; }
-
-    public function new(sp: Species.AnimalSpecies) {
-        super();
-        this.species = sp;
-        this.energy = 1;
-    }
-
-    function shouldChangeDirection(): Bool {
-        if (this.currentDirection == Direction.None) {
-            return true;
-        }
-        if (Random.int(0, 1000) < 250) {
-            return true;
-        }
-        return false;
-    }
-
-    override public function processMove(world: World) {
-        var cell = world.cells[this.x][this.y];
-        if (this.energy < this.species.maxEnergy && cell.nutrients > 0) return;
-
-        if (this.shouldChangeDirection()) {
-            this.changeDirection();
-        }
-
-        var point = common.Direction.Utils.directionToCoord(this.currentDirection);
-        point = [this.x + point.x, this.y + point.y];
-        if (!world.inBound(point)) {
-            this.changeDirection();
-            point = common.Direction.Utils.directionToCoord(this.currentDirection);
-            point = [this.x + point.x, this.y + point.y];
-        }
-        world.moveLife(this, point);
-    }
-
-    function changeDirection() {
-        var availableDirection = [Direction.Left, Direction.Up, Direction.Right, Direction.Down];
-        availableDirection = availableDirection.filter(function(d: Direction) {
-            return d != this.currentDirection && d != common.Direction.Utils.opposite(this.currentDirection);
-        });
-        this.currentDirection = Random.fromArray(availableDirection);
-    }
-
-    override public function processExtract(world: World) {
-        if (this.energy > this.species.maxEnergy) {
-            return;
-        }
-
-        var cell = world.cells[this.x][this.y];
-        var drained:Int = 0;
-        var have = hxd.Math.imin(cell.nutrients, this.species.nutrientAbsorptionRate - drained);
-
-        drained += have;
-        cell.nutrients -= have;
-
-        this.energy += Math.floor(this.species.energyMultiplier * drained);
-    }
-    override public function processProduce(world: World) {}
-    public function get_canReproduce(): Bool {
-        return (this.energy > this.species.reproductionEnergyRequirement &&
-                this.age > this.species.reproductionAgeRequirement);
-    }
-    override public function processReproduce(world: World) {
-        if (!this.canReproduce) {
-            return;
-        }
-
-        var chance = this.species.reproductionChance + (this.energy/200);
-        trace(this.energy);
-        trace(chance);
-        if (Random.int(0, 1000) > chance) {
-            return;
-        }
-
-        var cellList = common.GridUtils.getAround(world.cells, [this.x, this.y], 2);
-        Random.shuffle(cellList);
-
-        for (cell in cellList) {
-            if (cell.plant != null) {
-                continue;
-            }
-
-            var life = this.species.newLife();
-            life.x = cell.x;
-            life.y = cell.y;
-            world.addLife(life);
-            break;
-        }
-
-    }
-    override public function processAge(world: World) {
-        super.processAge(world);
-        this.energy -= hxd.Math.imin(this.energy, this.species.energyConsumption);
-    }
-    override public function processDie(world: World) {
-        var newNutrients = Math.floor(this.age * this.species.ageNutrientsMultiplier);
-        var cell = world.cells[this.x][this.y];
-        cell.nutrients += newNutrients;
-    }
-}
