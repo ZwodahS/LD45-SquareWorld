@@ -63,8 +63,8 @@ class Hud {
     public function redraw() {
         var ind = 0;
         for (d in this.speciesDrawable) {
-            d.x = 10;
-            d.y = 180 + (ind * 60);
+            d.x = 15 + (Math.floor(ind / 7) * 70);
+            d.y = 180 + (ind % 7 * 60);
             ind++;
         }
     }
@@ -173,6 +173,15 @@ class GameScene implements common.Scene {
         this.speciesList.push(new Species.Grass(assets));
         this.speciesList.push(new Species.Fungus(assets));
         this.speciesList.push(new Species.Bush(assets));
+        this.speciesList.push(new Species.Tree(assets));
+        this.speciesList.push(new Species.Slime(assets));
+        this.speciesList.push(new Species.Tree(assets));
+        this.speciesList.push(new Species.Slime(assets));
+        this.speciesList.push(new Species.Grass(assets));
+        this.speciesList.push(new Species.Fungus(assets));
+        this.speciesList.push(new Species.Bush(assets));
+        this.speciesList.push(new Species.Tree(assets));
+        this.speciesList.push(new Species.Slime(assets));
         this.speciesList.push(new Species.Tree(assets));
         this.speciesList.push(new Species.Slime(assets));
 
