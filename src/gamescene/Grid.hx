@@ -9,8 +9,8 @@ class Grid {
 
     var nutrientsBitmap: h2d.Bitmap;
 
-    public var nutrients(default, set): Int;
-    public var food(default, set): Int;
+    public var nutrients(default, set): Int = 0;
+    public var food(default, set): Int = 0;
 
     public var plant: Life = null;
     public var animal: Life = null;

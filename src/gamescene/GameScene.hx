@@ -418,14 +418,13 @@ class GameScene implements common.Scene {
     }
 
     function alignCamera() {
-        var window = hxd.Window.getInstance();
         this.camera.x = hxd.Math.clamp(
                 this.camera.x,
-                -(Constants.GridSize*this.camera.scaleX)*Constants.WorldWidth-5+window.width-160,
+                -(Constants.GridSize*this.camera.scaleX)*Constants.WorldWidth-5+Constants.windowWidth-(160*Constants.globalScale),
                 5);
         this.camera.y = hxd.Math.clamp(
                 this.camera.y,
-                -(Constants.GridSize*this.camera.scaleY)*Constants.WorldHeight-5+window.height,
+                -(Constants.GridSize*this.camera.scaleY)*Constants.WorldHeight-5+Constants.windowHeight,
                 5);
     }
 
