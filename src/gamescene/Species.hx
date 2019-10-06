@@ -716,8 +716,12 @@ class Rodent extends AnimalSpecies {
             return;
         }
 
-        if (life.targetLocation != null && (
-                    life.x == life.targetLocation.x && life.y == life.targetLocation.y)) {
+        if (life.targetLocation != null &&
+                (
+                    life.x == life.targetLocation.x && life.y == life.targetLocation.y ||
+                    world.cells[life.targetLocation.x][life.targetLocation.y].animal != null
+                )
+            ) {
             // reach but no food.
             life.targetLocation = null;
         }
@@ -733,7 +737,7 @@ class Rodent extends AnimalSpecies {
             });
 
             for (p in points) {
-                if (world.cells[p.x][p.y].food > 0) {
+                if (world.cells[p.x][p.y].food > 0 && world.cells[p.x][p.y].animal == null) {
                     life.targetLocation = p;
                     break;
                 }
