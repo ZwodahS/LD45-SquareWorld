@@ -89,6 +89,14 @@ class Asset2D {
         }
         return out;
     }
+
+    public function getTiles(): Array<h2d.Tile> {
+        var out = new Array<h2d.Tile>();
+        for (i in 0...this.tiles.length) {
+            out.push(this.tiles[i].tile);
+        }
+        return out;
+    }
 }
 
 typedef Frame = {

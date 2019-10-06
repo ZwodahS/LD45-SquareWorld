@@ -46,7 +46,7 @@
    },
    {
     "filename": "images 5.aseprite",
-    "frame": { "x": 0, "y": 24, "w": 24, "h": 24 },
+    "frame": { "x": 120, "y": 0, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -55,7 +55,7 @@
    },
    {
     "filename": "images 6.aseprite",
-    "frame": { "x": 24, "y": 24, "w": 24, "h": 24 },
+    "frame": { "x": 144, "y": 0, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -64,7 +64,7 @@
    },
    {
     "filename": "images 7.aseprite",
-    "frame": { "x": 48, "y": 24, "w": 24, "h": 24 },
+    "frame": { "x": 168, "y": 0, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -73,7 +73,7 @@
    },
    {
     "filename": "images 8.aseprite",
-    "frame": { "x": 72, "y": 24, "w": 24, "h": 24 },
+    "frame": { "x": 192, "y": 0, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -82,7 +82,7 @@
    },
    {
     "filename": "images 9.aseprite",
-    "frame": { "x": 96, "y": 24, "w": 24, "h": 24 },
+    "frame": { "x": 216, "y": 0, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -91,7 +91,7 @@
    },
    {
     "filename": "images 10.aseprite",
-    "frame": { "x": 0, "y": 48, "w": 24, "h": 24 },
+    "frame": { "x": 0, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -100,7 +100,7 @@
    },
    {
     "filename": "images 11.aseprite",
-    "frame": { "x": 24, "y": 48, "w": 24, "h": 24 },
+    "frame": { "x": 24, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -109,7 +109,7 @@
    },
    {
     "filename": "images 12.aseprite",
-    "frame": { "x": 48, "y": 48, "w": 24, "h": 24 },
+    "frame": { "x": 48, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -118,7 +118,7 @@
    },
    {
     "filename": "images 13.aseprite",
-    "frame": { "x": 72, "y": 48, "w": 24, "h": 24 },
+    "frame": { "x": 72, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -127,7 +127,7 @@
    },
    {
     "filename": "images 14.aseprite",
-    "frame": { "x": 96, "y": 48, "w": 24, "h": 24 },
+    "frame": { "x": 96, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -136,7 +136,7 @@
    },
    {
     "filename": "images 15.aseprite",
-    "frame": { "x": 0, "y": 72, "w": 24, "h": 24 },
+    "frame": { "x": 120, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -145,7 +145,7 @@
    },
    {
     "filename": "images 16.aseprite",
-    "frame": { "x": 24, "y": 72, "w": 24, "h": 24 },
+    "frame": { "x": 144, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -154,7 +154,7 @@
    },
    {
     "filename": "images 17.aseprite",
-    "frame": { "x": 48, "y": 72, "w": 24, "h": 24 },
+    "frame": { "x": 168, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -163,7 +163,7 @@
    },
    {
     "filename": "images 18.aseprite",
-    "frame": { "x": 72, "y": 72, "w": 24, "h": 24 },
+    "frame": { "x": 192, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -172,7 +172,7 @@
    },
    {
     "filename": "images 19.aseprite",
-    "frame": { "x": 96, "y": 72, "w": 24, "h": 24 },
+    "frame": { "x": 216, "y": 24, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -181,7 +181,7 @@
    },
    {
     "filename": "images 20.aseprite",
-    "frame": { "x": 0, "y": 96, "w": 24, "h": 24 },
+    "frame": { "x": 0, "y": 48, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -190,7 +190,7 @@
    },
    {
     "filename": "images 21.aseprite",
-    "frame": { "x": 24, "y": 96, "w": 24, "h": 24 },
+    "frame": { "x": 24, "y": 48, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -199,7 +199,7 @@
    },
    {
     "filename": "images 22.aseprite",
-    "frame": { "x": 48, "y": 96, "w": 24, "h": 24 },
+    "frame": { "x": 48, "y": 48, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -208,7 +208,7 @@
    },
    {
     "filename": "images 23.aseprite",
-    "frame": { "x": 72, "y": 96, "w": 24, "h": 24 },
+    "frame": { "x": 72, "y": 48, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -217,7 +217,70 @@
    },
    {
     "filename": "images 24.aseprite",
-    "frame": { "x": 96, "y": 96, "w": 24, "h": 24 },
+    "frame": { "x": 96, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 25.aseprite",
+    "frame": { "x": 120, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 26.aseprite",
+    "frame": { "x": 144, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 27.aseprite",
+    "frame": { "x": 168, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 28.aseprite",
+    "frame": { "x": 192, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 29.aseprite",
+    "frame": { "x": 216, "y": 48, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 30.aseprite",
+    "frame": { "x": 0, "y": 72, "w": 24, "h": 24 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
+    "sourceSize": { "w": 24, "h": 24 },
+    "duration": 100
+   },
+   {
+    "filename": "images 31.aseprite",
+    "frame": { "x": 24, "y": 72, "w": 24, "h": 24 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -230,7 +293,7 @@
   "version": "1.2.13",
   "image": "images.png",
   "format": "RGBA8888",
-  "size": { "w": 128, "h": 128 },
+  "size": { "w": 256, "h": 128 },
   "scale": "1",
   "frameTags": [
    { "name": "animal_fill", "from": 0, "to": 0, "direction": "forward" },
@@ -242,7 +305,9 @@
    { "name": "tree", "from": 13, "to": 15, "direction": "forward" },
    { "name": "fungus", "from": 16, "to": 18, "direction": "forward" },
    { "name": "grass", "from": 19, "to": 21, "direction": "forward" },
-   { "name": "slime", "from": 22, "to": 24, "direction": "forward" }
+   { "name": "slime", "from": 22, "to": 24, "direction": "forward" },
+   { "name": "food", "from": 25, "to": 27, "direction": "forward" },
+   { "name": "nutrient", "from": 28, "to": 30, "direction": "forward" }
   ],
   "layers": [
    { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }

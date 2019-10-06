@@ -10,17 +10,31 @@ class Grid {
     var nutrientsBitmap: h2d.Bitmap;
 
     public var nutrients(default, set): Int;
+    public var food(default, set): Int;
 
     public var plant: Life = null;
     public var animal: Life = null;
 
-    public function new() {
+    var assets: common.Assets;
+
+    var currentFoodIndex: Int = -2;
+    var currentNutrientsIndex: Int = -2;
+
+    var foodAnim: h2d.Anim = null;
+    var nutrientsAnim: h2d.Anim = null;
+
+    public function new(assets: common.Assets) {
         this.drawable = new h2d.Layers();
         this.drawable.add(new h2d.Bitmap(h2d.Tile.fromColor(0x241C07, Constants.GridSize, Constants.GridSize)), 0);
-        this.nutrientsBitmap = new h2d.Bitmap(h2d.Tile.fromColor(0xFFFF55, Constants.GridSize, Constants.GridSize));
-        this.drawable.add(nutrientsBitmap, 1);
+
+        this.foodAnim = new h2d.Anim(assets.getAsset("food").getTiles(), 0);
+        this.drawable.add(this.foodAnim, 1);
+        this.nutrientsAnim = new h2d.Anim(assets.getAsset("nutrient").getTiles(), 0);
+        this.nutrientsAnim.color = h3d.Vector.fromColor(0xFFFFFF55);
+        this.drawable.add(this.nutrientsAnim, 1);
+
         this.nutrients = Math.floor(Math.random() * 80);
-        updateNutrientsBitmap();
+        updateBitmap();
     }
 
     public function set_x(x: Int): Int {
@@ -37,11 +51,39 @@ class Grid {
 
     public function set_nutrients(nutrients: Int): Int {
         this.nutrients = nutrients;
-        this.updateNutrientsBitmap();
+        this.updateBitmap();
         return this.nutrients;
     }
 
-    function updateNutrientsBitmap() {
-        this.nutrientsBitmap.color.w = Math.min(this.nutrients / 300, 0.5);
+    public function set_food(food: Int): Int {
+        this.food = food;
+        this.updateBitmap();
+        return this.food;
+    }
+
+    function updateBitmap() {
+        var newFoodIndex = Math.ceil(hxd.Math.clamp(this.food/100, 0, 3)) - 1;
+        var newNutrientIndex = Math.ceil(hxd.Math.clamp(this.nutrients/70, 0, 3)) - 1;
+        if (newFoodIndex != this.currentFoodIndex) {
+            this.currentFoodIndex = newFoodIndex;
+            if (this.currentFoodIndex == -1 ){
+                this.foodAnim.visible = false;
+            } else {
+                this.foodAnim.currentFrame = this.currentFoodIndex;
+                this.foodAnim.visible = true;
+            }
+        }
+
+        this.nutrientsAnim.color.a = hxd.Math.clamp(this.nutrients/200, 0.0, 1.0);
+
+        if (newNutrientIndex != this.currentNutrientsIndex) {
+            this.currentNutrientsIndex = newNutrientIndex;
+            if (this.currentNutrientsIndex == -1) {
+                this.nutrientsAnim.visible = false;
+            } else {
+                this.nutrientsAnim.visible = true;
+                this.nutrientsAnim.currentFrame = this.currentNutrientsIndex;
+            }
+        }
     }
 }

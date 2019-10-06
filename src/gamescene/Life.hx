@@ -15,6 +15,8 @@ class Life {
     public var y(default, set): Int = 0;
 
     public var energy: Int = 0;
+    public var mass: Int = 0;
+
     public var isAlive(get, null): Bool;
 
     public var type(get, null): String;
@@ -22,6 +24,7 @@ class Life {
     public var energyGainedThisStep: Int = 0;
     public var currentDirection: Direction = Direction.None;
     public var stage: Int = 0;
+    public var isDead: Bool = false;
 
     public function new(species: Species) {
         this.species = species;
@@ -47,6 +50,17 @@ class Life {
         return this.age;
     }
 
+    public function die() {
+        this.isDead = true;
+        var c = this.drawable.getChildAt(0);
+        if (c != null) {
+            var v: h2d.Bitmap = Std.downcast(c, h2d.Bitmap);
+            if (v != null) {
+                v.color = h3d.Vector.fromColor(0xFF333333);
+            }
+        }
+    }
+
     public function processMove(world: World) {
         this.species.processMove(this, world);
     }
@@ -59,8 +73,11 @@ class Life {
     public function processReproduce(world: World) {
         this.species.processReproduce(this, world);
     }
-    public function processAge(world: World) {
-        this.species.processAge(this, world);
+    public function processConsume(world: World) {
+        this.species.processConsume(this, world);
+    }
+    public function processGrowth(world: World) {
+        this.species.processGrowth(this, world);
     }
     public function processDie(world: World) {
         this.species.processDie(this, world);
@@ -70,7 +87,7 @@ class Life {
     }
 
     public function get_isAlive(): Bool {
-        return this.energy > 0;
+        return !this.isDead;
     }
 
     public function get_type(): String {

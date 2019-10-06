@@ -17,4 +17,16 @@ class GridUtils {
         }
         return cellList;
     }
+    public static function getPointsAround(coord: Point2i, width:Int = 1, bound: Recti): Array<Point2i> {
+        var cellList: Array<Point2i> = new Array<Point2i>();
+        for (x in -(width)...(width+1)) {
+            for (y in -(width)...(width+1)) {
+                var c = coord + [x, y];
+                if (c.x >= bound.xMin && c.x <= bound.xMax && c.y >= bound.yMin && c.y <= bound.yMax) {
+                    cellList.push(c);
+                }
+            }
+        }
+        return cellList;
+    }
 }

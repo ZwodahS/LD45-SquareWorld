@@ -37,6 +37,7 @@ class InfoLayer extends h2d.Layers {
     var nameData: h2d.Text;
     var typeData: h2d.Text;
     var descriptionData: h2d.Text;
+    var detailData: h2d.Text;
 
     var fontColor: h3d.Vector = new h3d.Vector(0, 0, 0);
     var titleColor: h3d.Vector = h3d.Vector.fromColor(0xFFFFFFFF);
@@ -51,7 +52,7 @@ class InfoLayer extends h2d.Layers {
         var fontH1 = hxd.res.DefaultFont.get();
         fontH1.resizeTo(24);
         var fontH2 = fontH1.clone();
-        fontH2.resizeTo(16);
+        fontH2.resizeTo(14);
         var fontP = fontH2.clone();
         fontP.resizeTo(12);
         var background = new h2d.Bitmap(h2d.Tile.fromColor(0x663931, 500, 500));
@@ -67,6 +68,9 @@ class InfoLayer extends h2d.Layers {
 
         this.descriptionData = common.Factory.createH2dText(fontH2, "", textOffset + [10.0, 100.0], this.blue);
         this.add(descriptionData, 1);
+
+        this.detailData = common.Factory.createH2dText(fontH2, "", textOffset + [10.0, 250.0], this.green);
+        this.add(detailData, 1);
 
         this.y = (Constants.WindowHeight - background.tile.height) / 2 * Constants.globalScale;
         this.x = (Constants.WindowWidth - 160 - background.tile.width) / 2 * Constants.globalScale;
@@ -89,6 +93,7 @@ class InfoLayer extends h2d.Layers {
         this.nameData.text = species.nameString;
         this.typeData.text = species.typeString;
         this.descriptionData.text = species.description;
+        this.detailData.text = species.detail;
     }
 }
 
@@ -272,7 +277,7 @@ class GameScene implements common.Scene {
         this.worldLayer = new h2d.Layers(this.camera);
         this.foregroundLayer = new h2d.Layers(this.camera);
 
-        this.world = new World(this.worldLayer, Constants.WorldWidth, Constants.WorldHeight);
+        this.world = new World(this.worldLayer, Constants.WorldWidth, Constants.WorldHeight, this.assets);
         for (x in 0...Constants.WorldWidth) {
             for (y in 0...Constants.WorldHeight) {
                 this.worldLayer.add(this.world.cells[x][y].drawable, 0);
@@ -288,10 +293,13 @@ class GameScene implements common.Scene {
             life.processExtract(this.world);
         }
         for (life in this.world.lifeList) {
+            life.processConsume(this.world);
+        }
+        for (life in this.world.lifeList) {
             life.processProduce(this.world);
         }
         for (life in this.world.lifeList) {
-            life.processAge(this.world);
+            life.processGrowth(this.world);
         }
         for (life in this.world.lifeList) {
             if (!life.isAlive) {

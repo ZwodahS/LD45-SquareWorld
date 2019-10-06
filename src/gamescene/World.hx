@@ -10,14 +10,14 @@ class World {
     var worldLayer: h2d.Layers;
     public var lifeList: List<Life>;
 
-    public function new(worldLayer: h2d.Layers, width: Int, height: Int) {
+    public function new(worldLayer: h2d.Layers, width: Int, height: Int, assets: common.Assets) {
         this.worldLayer = worldLayer;
         this.lifeList = new List<Life>();
         this.cells = new Vector<Vector<Grid>>(width);
         for (x in 0...width) {
             this.cells[x] = new Vector<Grid>(height);
             for (y in 0...height) {
-                var grid = new Grid();
+                var grid = new Grid(assets);
                 grid.x = x;
                 grid.y = y;
                 this.cells[x][y] = grid;
@@ -94,5 +94,22 @@ class World {
 
     public function inBound(pos: Point2i): Bool {
         return pos.x >= 0 && pos.x < this.cells.length && pos.y >= 0 && pos.y < this.cells[0].length;
+    }
+
+    public function drainNutrients(pos: Point2i, amount: Int): Int {
+        var cell = this.inBound(pos) ? this.cells[pos.x][pos.y] : null;
+        if (cell == null) return 0;
+
+        var drain = hxd.Math.imin(cell.nutrients, amount);
+        cell.nutrients -= drain;
+        return drain;
+    }
+
+    public function addFood(pos: Point2i, amount: Int): Bool {
+        var cell = this.inBound(pos) ? this.cells[pos.x][pos.y]: null;
+        if (cell == null) return false;
+
+        cell.food += amount;
+        return true;
     }
 }

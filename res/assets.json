@@ -65,6 +65,38 @@
             }
         ]
     },
+    "food": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "food0"
+            },
+            {
+                "src": "images",
+                "key": "food1"
+            },
+            {
+                "src": "images",
+                "key": "food2"
+            }
+        ]
+    },
+    "nutrient": {
+        "frames": [
+            {
+                "src": "images",
+                "key": "nutrient0"
+            },
+            {
+                "src": "images",
+                "key": "nutrient1"
+            },
+            {
+                "src": "images",
+                "key": "nutrient2"
+            }
+        ]
+    },
     "background": {
         "frame": {
             "src": "images",
