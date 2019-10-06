@@ -49,7 +49,7 @@ class InfoLayer extends h2d.Layers {
     public function new(assets: common.Assets) {
         super();
 
-        var fontH1 = hxd.res.DefaultFont.get();
+        var fontH1 = hxd.res.DefaultFont.get().clone();
         fontH1.resizeTo(24);
         var fontH2 = fontH1.clone();
         fontH2.resizeTo(14);
@@ -63,8 +63,6 @@ class InfoLayer extends h2d.Layers {
         this.nameData = common.Factory.createH2dText(fontH1, "", textOffset + [10.0, 10.0], this.titleColor);
         this.add(nameData, 1);
 
-        this.typeData = common.Factory.createH2dText(fontP, "", textOffset + [20.0, 70.0], this.grey);
-        this.add(typeData, 1);
 
         this.descriptionData = common.Factory.createH2dText(fontH2, "", textOffset + [10.0, 100.0], this.blue);
         this.add(descriptionData, 1);
@@ -91,7 +89,6 @@ class InfoLayer extends h2d.Layers {
         this.visible = true;
 
         this.nameData.text = species.nameString;
-        this.typeData.text = species.typeString;
         this.descriptionData.text = species.description;
         this.detailData.text = species.detail;
     }
@@ -128,8 +125,8 @@ class Hud {
         this.speciesList = new Array<Species>();
         this.speciesDrawable = new Array<Species.SpCard>();
 
-        var fontH1 = hxd.res.DefaultFont.get();
-        fontH1.resizeTo(6);
+        var fontH1 = hxd.res.DefaultFont.get().clone();
+        fontH1.resizeTo(12);
 
         this.drawable.add(common.Factory.createH2dText(fontH1, "Nutrient", [10.0, 10.0], this.titleColor), 0);
         this.nutrientText = common.Factory.createH2dText(fontH1, "35", [80.0, 10.0], this.titleColor);
@@ -149,14 +146,19 @@ class Hud {
     }
 
     public function display(grid: Grid) {
+        if (grid == null) return;
         this.nutrientText.text = '${grid.nutrients}';
         this.foodText.text = '${grid.food}';
         if (grid.animal != null) {
             this.animalText.text = '${grid.animal.age} / ${grid.animal.energy} / ${grid.animal.mass}';
+        } else {
+            this.animalText.text = '- / - / -';
         }
 
         if (grid.plant != null) {
             this.plantText.text = '${grid.plant.age} / ${grid.plant.energy} / ${grid.plant.mass}';
+        } else {
+            this.plantText.text = '- / - / -';
         }
     }
 
@@ -277,6 +279,9 @@ class GameScene implements common.Scene {
     var infoLayer: InfoLayer;
     var isPaused: Bool = false;
 
+    var stepCounter:Int = 0;
+    var stepCounterText: h2d.Text;
+
     public function new(assets: common.Assets) {
         this.scene = new h2d.Scene();
         this.camera = new h2d.Camera(this.scene);
@@ -291,6 +296,11 @@ class GameScene implements common.Scene {
         this.hud = new Hud(assets, this.infoLayer);
         this.scene.add(this.hud.drawable, 0);
 
+        var fontH1 = hxd.res.DefaultFont.get().clone();
+        fontH1.resizeTo(12);
+        this.stepCounterText = common.Factory.createH2dText(fontH1, "", [5, 5], h3d.Vector.fromColor(0x77FFFFFF));
+        this.scene.add(this.stepCounterText, 5);
+
         this.speciesList.push(new Species.Grass(assets));
         this.speciesList.push(new Species.Fungus(assets));
         this.speciesList.push(new Species.Bush(assets));
@@ -298,8 +308,6 @@ class GameScene implements common.Scene {
         this.speciesList.push(new Species.Slime(assets));
         this.speciesList.push(new Species.Rodent(assets));
         this.speciesList.push(new Species.Insect(assets));
-        this.speciesList.push(new Species.Isopod(assets));
-        this.speciesList.push(new Species.Bird(assets));
 
         for (s in this.speciesList) {
             this.hud.addSpecies(s);
@@ -356,6 +364,8 @@ class GameScene implements common.Scene {
             if (!this.isPaused) {
                 this.simulate();
             }
+            this.stepCounter += 1;
+            this.stepCounterText.text = 'Time: ${this.stepCounter}';
         }
         var camMove = new Point2f(0, 0);
         if (moveCamera[0]) camMove.y += dt * 500;
@@ -369,7 +379,11 @@ class GameScene implements common.Scene {
         }
 
         var pos = translateWorldPosToCell(translateMousePositionToWorld(this.mouseCurrent));
-        this.hud.display(world.cells[pos.x][pos.y]);
+        if (world.inBound(pos)) {
+            this.hud.display(world.cells[pos.x][pos.y]);
+        } else {
+            this.hud.display(null);
+        }
     }
 
     public function render(engine: h3d.Engine) {
@@ -397,7 +411,9 @@ class GameScene implements common.Scene {
     var mouseDownEvent: hxd.Event = null;
     var startDrag: Bool = false;
     function mouseDown(event: hxd.Event) {
-        this.mouseDownEvent = event;
+        if (event.button == 1) {
+            this.mouseDownEvent = event;
+        }
     }
 
     var mouseCurrent: Point2f = [0.0, 0.0];

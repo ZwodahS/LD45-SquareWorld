@@ -43,7 +43,7 @@ class SpCard extends h2d.Layers {
         if (this.isSelected) return;
         if (this.isHovered) this.unhover();
 
-        this.spcard.color = new h3d.Vector(1.0, 1.0, 0.6);
+        this.spcard.color = new h3d.Vector(1.0, 1.0, 0.0);
         this.isSelected = true;
     }
 
@@ -175,8 +175,10 @@ class PlantSpecies extends Species{
     }
 
     override function processConsume(life: Life, world: World) {
+        life.energyConsumedThisStep = 0;
         var consumed = hxd.Math.imin(life.energy, this.consumptionRate);
         life.energy -= consumed;
+        life.energyConsumedThisStep = consumed;
         if (this.autoDie && life.energy == 0) {
             life.die();
         }
@@ -215,9 +217,7 @@ class PlantSpecies extends Species{
 
     override function processGrowth(life: Life, world: World) {
         super.processGrowth(life, world);
-        var consume = hxd.Math.imin(life.energy, this.consumptionRate);
-        life.energy -= consume;
-        if (consume > 0) {
+        if (life.energyConsumedThisStep > 0) {
             life.mass += massPerTurn;
         }
         if (this.maxMass != -1) {
@@ -388,7 +388,7 @@ class Fungus extends PlantSpecies {
         this.nutrientAbsorptionRate = 10;
 
         this.consumptionRate = 50;
-        this.massPerTurn = 10;
+        this.massPerTurn = 5;
         this.autoDie = true;
 
         this.reproductionChance = 100;
@@ -417,7 +417,7 @@ class Grass extends PlantSpecies {
         this.nutrientAbsorptionRate = 2;
 
         this.consumptionRate = 5;
-        this.massPerTurn = 1;
+        this.massPerTurn = 10;
         this.autoDie = false;
 
         this.reproductionChance = 1;
@@ -451,6 +451,7 @@ class AnimalSpecies extends Species {
     public var reproductionChance(default, null): Int = 10;
     public var reproductionEnergyRequirement(default, null): Int = 0;
     public var reproductionAgeRequirement(default, null): Int = 100;
+    public var reproduceRange: Int = 1;
     public var maxEnergy(default, null): Int = 5000;
     public var maxMass: Int = 1000;
     public var massPerTurn: Int = 3;
@@ -507,9 +508,7 @@ class AnimalSpecies extends Species {
 
     override function processGrowth(life: Life, world: World) {
         super.processGrowth(life, world);
-        var consume = hxd.Math.imin(life.energy, this.consumptionRate);
-        life.energy -= consume;
-        if (consume > 0) {
+        if (life.energyConsumedThisStep > 0) {
             life.mass += massPerTurn;
         }
         if (this.maxMass != -1) {
@@ -540,7 +539,7 @@ class AnimalSpecies extends Species {
             return;
         }
 
-        var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], 2);
+        var cellList = common.GridUtils.getAround(world.cells, [life.x, life.y], this.reproduceRange);
         Random.shuffle(cellList);
 
         for (cell in cellList) {
@@ -565,7 +564,6 @@ class AnimalSpecies extends Species {
         cellList.push(world.cells[life.x][life.y]);
         Random.shuffle(cellList);
         var newNutrients = life.mass * Constants.NutrientPerMass + Math.floor(life.energy / Constants.EnergyPerNutrient);
-        trace('new nutrients: ${newNutrients}');
         var spread = Math.floor(newNutrients / 2 / cellList.length);
         // 50% evenly spread
         for (cell in cellList) {
@@ -582,8 +580,10 @@ class AnimalSpecies extends Species {
     }
 
     override function processConsume(life: Life, world: World) {
+        life.energyConsumedThisStep = 0;
         var consumed = hxd.Math.imin(life.energy, this.consumptionRate);
         life.energy -= consumed;
+        life.energyConsumedThisStep = consumed;
         if (life.energy == 0) {
             life.die();
         }
@@ -666,12 +666,13 @@ class Rodent extends AnimalSpecies {
         this.massPerTurn = 1;
         this.energyMultiplier = 50;
         this.foodAbsorptionRate = 10;
+        this.growRequirement = [25];
 
         this.description = (
                 'Rodent are small creatures that eat the food that tree and\nbushes produces.\n'+
                 'It will try to search for the nearest food and move towards it\n'+
-                'If it can\' find a food source, it will move around random\nhoping to get close to food'+
-                'Rodent also produces nutrients as it move around'
+                'If it can\' find a food source, it will move around random\nhoping to get close to food\n'+
+                'Rodent also produces nutrients as it move around.'
         );
     }
 
@@ -762,6 +763,131 @@ class Rodent extends AnimalSpecies {
 class Insect extends AnimalSpecies {
     public function new(assets: common.Assets) {
         super(assets, assets.getAsset("insect"));
+
+        this.nameString = "Insect";
+        this.typeString = "animal";
+
+        this.consumptionRate = 20;
+        this.maxEnergy = 5000;
+        this.massPerTurn = 2;
+        this.energyMultiplier = 50;
+
+        this.reproductionChance = 50;
+        this.reproductionEnergyRequirement = 1000;
+        this.reproduceRange = 2;
+        this.reproductionAgeRequirement = 25;
+        this.dieNutrientsRange = 2;
+        this.growRequirement = [25];
+
+        this.description = (
+                'Insect is a crazy eater, capable of eating fungus and grass\n'+
+                'Insect reproduce very fast once it is able to gain a lot of energy\n'+
+                'However, if the energy level of the insect is too high or\n if it grows too big, it will die'
+        );
+    }
+
+    override public function shouldMove(life: Life, world: World): Bool {
+        var cell = world.cells[life.x][life.y];
+        // Too lazy to write another checker
+        if (this.haveFood(cell)) return false;
+
+        return true;
+    }
+
+    function haveFood(cell: Grid): Bool {
+        if (cell.plant == null) return false;
+        if (cell.plant.species.nameString == "Fungus" || cell.plant.species.nameString == "Grass") {
+            return true;
+        }
+        return false;
+    }
+
+    override public function processExtract(life: Life, world: World) {
+        life.energyGainedThisStep = 0;
+        var cell = world.cells[life.x][life.y];
+        if (!this.haveFood(cell)) return;
+        cell.plant.mass -= 5;
+        life.energy += 50;
+        life.energyGainedThisStep = 50;
+    }
+
+    override function processProduce(life: Life, world: World) {
+        if (life.energy == 0) return;
+
+        world.addNutrients([life.x, life.y], 2);
+    }
+
+    override public function processMove(life: Life, world: World) {
+        if (!this.shouldMove(life, world)) {
+            life.targetLocation = null;
+            return;
+        }
+
+        if (life.targetLocation != null && (
+                    life.x == life.targetLocation.x && life.y == life.targetLocation.y)) {
+            // reach but no food.
+            life.targetLocation = null;
+        }
+
+        if (life.targetLocation == null) {
+            // try to see if there are any food in the surrounding area
+            var points = common.GridUtils.getPointsAround(
+                    [life.x, life.y], 4,
+                    [0, 0, world.cells.length-1, world.cells[0].length-1]
+            );
+            points.sort(function(p1: Point2i, p2: Point2i): Int {
+                return p1.distance([life.x, life.y]) - p2.distance([life.x, life.y]);
+            });
+
+            for (p in points) {
+                if (this.haveFood(world.cells[p.x][p.y])) {
+                    life.targetLocation = p;
+                    break;
+                }
+            }
+            if (life.targetLocation == null) {
+                // if no food, let's die
+                life.canFindPlant = false;
+            }
+        }
+        this.changeDirection(life);
+
+        var point = common.Direction.Utils.directionToCoord(life.currentDirection);
+        point = [life.x + point.x, life.y + point.y];
+        if (!world.inBound(point)) {
+            this.changeDirection(life);
+            point = common.Direction.Utils.directionToCoord(life.currentDirection);
+            point = [life.x + point.x, life.y + point.y];
+        }
+        world.moveLife(life, point);
+    }
+
+    override function changeDirection(life: Life) {
+        var availableDirection = [Direction.Left, Direction.Up, Direction.Right, Direction.Down];
+        if (life.targetLocation != null) {
+            // set direction based on target Location
+            var diff = life.targetLocation - [life.x, life.y];
+            if (Math.abs(diff.x) > Math.abs(diff.y)) {
+                life.currentDirection = diff.x > 0 ? Direction.Right : Direction.Left;
+            } else {
+                life.currentDirection = diff.y > 0 ? Direction.Down : Direction.Up;
+            }
+            return;
+        }
+        availableDirection = availableDirection.filter(function(d: Direction) {
+            return d != life.currentDirection && d != common.Direction.Utils.opposite(life.currentDirection);
+        });
+        life.currentDirection = Random.fromArray(availableDirection);
+    }
+
+    override function reproduce(life: Life): Life {
+        var newLife = this.newLife();
+        life.energy -= this.reproductionEnergyRequirement;
+        return newLife;
+    }
+
+    override public function shouldDie(life: Life): Bool {
+        return life.energy > 2500 || life.mass > 300;
     }
 }
 

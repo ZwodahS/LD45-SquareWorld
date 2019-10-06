@@ -6,7 +6,7 @@ import common.Direction;
 
 class Life {
 
-    var species: Species;
+    public var species: Species;
 
     public var age: Int = 0;
     public var drawable: h2d.Layers;
@@ -22,6 +22,7 @@ class Life {
     public var type(get, null): String;
 
     public var energyGainedThisStep: Int = 0;
+    public var energyConsumedThisStep: Int = 0;
     public var lastProducedAge: Int = 0;
     public var currentDirection: Direction = Direction.None;
     public var stage: Int = 0;
@@ -29,6 +30,7 @@ class Life {
 
     public var numOffspring: Int = 0;
     public var targetLocation: common.Point2i = null;
+    public var canFindPlant: Bool = true;
 
     public function new(species: Species) {
         this.species = species;
